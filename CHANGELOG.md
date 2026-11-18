@@ -1,0 +1,1356 @@
+# Changelog
+
+All notable changes to FScript are documented in this file.
+
+## [Unreleased]
+
+- Publish to VS Code Marketplace through GitHub OIDC Trusted Publishing without a stored marketplace token.
+- Maintain extension development, client and grammar tests, VSIX packaging, and marketplace publication in FScriptLang/vscode-extension.
+
+## [0.94]
+
+### [0.94.3]
+
+- Publish one Stable manual with full release history and a separate Next manual with unreleased changes, without committing website snapshots.
+- Restore local changelog preparation and validate release tags against their release branch and release notes.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.94.2...0.94.3
+
+### [0.94.2]
+
+- Add go-to-definition from generic type parameter uses to their declarations in VS Code.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.94.1...0.94.2
+
+### [0.94.1]
+
+- Fix VS Code highlighting of generic type parameters such as `'item` when the language server is active.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.94.0...0.94.1
+
+### [0.94.0]
+
+- Preserve verifiable IL when opted-in FFI loops execute inside larger expressions.
+- Reject FFI expansion that would reference inaccessible generic method type arguments.
+- Add reproducible FFI inlining tests for argument effects, exceptions, closures, and IL control flow.
+- Add reproducible four-way backend conformance tests with bounded typed programs, shrinking, and replay.
+- Add reproducible property coverage for all default runtime FFI providers, internal codecs, and permission registration.
+- Reject non-finite floats during JSON serialization instead of returning invalid JSON across source, compiled, and SDK calls.
+- Add reproducible mailbox state-model tests for FIFO delivery, bounded queues, shutdown, and handler failures.
+- Extend reproducible inference tests to generic records and unions containing opaque instances and independent callbacks.
+- Preserve independent opaque factory types when factories pass through union constructors.
+- Add reproducible property tests for type generalization and captured opaque instances, with shrinking and failure replay.
+- Preserve opaque instance types through captured closures while keeping unrelated callbacks polymorphic.
+- Report concurrent host access from mailbox handlers, state, and messages, respecting completion ordering.
+- Document Mailbox usage, shutdown, and the Threading permission in the standard library reference.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.93.0...0.94.0
+
+## [0.93]
+
+### [0.93.0]
+
+- Add bounded mailboxes to the default runtime with source, C#, and .NET execution support.
+- Support generic opaque types and tracked provider workers through the Extensibility 2.0 SDK. Rebuild existing providers against SDK 2.0.
+- Support unconstrained generic functions, records, and unions with F#-style type parameters and arguments.
+- Highlight generic type parameters and arguments in VS Code.
+- Keep one manual for each of the five latest release lines and group patch notes under their release line.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.92.5...0.93.0
+
+## [0.92]
+
+### [0.92.5]
+
+- Fold more script-defined constants and remove unreachable code in C# and .NET builds.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.92.4...0.92.5
+
+### [0.92.4]
+
+- Show record field types on hover and navigate from record literals to field declarations in VS Code.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.92.3...0.92.4
+
+### [0.92.3]
+
+- Report non-exhaustive matches as type errors before a script runs.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.92.2...0.92.3
+
+### [0.92.2]
+
+- Fix Go to Definition for function usages in pipelines followed by a lambda.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.92.1...0.92.2
+
+### [0.92.1]
+
+- Fix VS Code language server startup by requesting the .NET 11 runtime.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.92.0...0.92.1
+
+### [0.92.0]
+
+- Restore animated progress in local Terrabuild builds and use Terrabuild’s diagnostic logs in CI.
+- Speed up .NET compilation for scripts that forward unused closure captures through generated helpers.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.91.0...0.92.0
+
+## [0.91]
+
+### [0.91.0]
+
+- Run the FScript CLI and language server on .NET 11 and target .NET 11 when compiling scripts to .NET or C#.
+- Document how compiled programs optimize `List.init`.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.90.3...0.91.0
+
+## [0.90]
+
+### [0.90.3]
+
+- Speed up release preparation by reusing cached CI checks and verifying packages in parallel.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.90.2...0.90.3
+
+### [0.90.2]
+
+- Configure Terrabuild and registry authentication so tagged builds can produce release artifacts.
+- Speed up `List.init` in compiled .NET programs and generated C#.
+- Install Node.js before reading workspace tool versions in CI.
+- Restore detailed cached build logs in CI with the Terrabuild 0.207.2 cache fix.
+- Avoid cached-log rendering failures in CI while retaining build traces and test-report checks.
+- Keep build-tooling and shard-configuration regressions on demand instead of delaying every CI build.
+- Batch compatible .NET builds into dependency-connected solutions while keeping per-project test reports separate.
+- Let .NET restore and build project references when compiling against partially cached outputs.
+- Restore the CLI executable before running CLI tests from a cached test build.
+- Publish build toolchain images under the `ghcr.io/magnusopera/fscript/` namespace.
+- Run .NET tests from cached builds on fresh runners and fail CI when expected test reports are missing or empty.
+- Restore cached CI test reports directly with Terrabuild and retain diagnostics for each shard selection.
+- Document the Terrabuild and Docker requirements for building FScript from source.
+- Keep VS Code builds cached when release notes change by adding the changelog only during extension packaging.
+- Cancel superseded branch and pull-request CI runs for the same source branch while keeping test shards parallel.
+- Label GitHub test shards as test instead of ci in Insights.
+- Keep GitHub workflow reruns in separate Insights build groups while correlating each attempt's build and test shards.
+- Publish the CI toolchain as a single image manifest so test runners can pull it from GHCR.
+- Use Terrabuild's native Docker publishing and hash-based toolchain tags.
+- Reuse GHCR toolchain images across CI runners.
+- Restore the CLI and website test dependencies when CI shards start with cached builds on fresh runners.
+- Report the GitHub build and all test shards as one Insights build group per workflow attempt.
+- Split GitHub CI into a cached build, parallel test shards, and combined test reports, including separate Native AOT variants.
+- Allow the native teapot debugger test to finish mesh generation on busy CI runners and report clearer event timeouts.
+- Define shared build-tool versions in WORKSPACE for container builds and GitHub workflows.
+- Update the .NET build toolchain to SDK 10.0.403 so Native AOT publishing uses the patched compiler.
+- Publish .NET, JavaScript, and debugger test summaries and downloadable Terrabuild logs in CI.
+- Install the latest stable Terrabuild release in CI.
+- Run Terrabuild CI on pushes to every branch.
+- Add container-backed Terrabuild builds and cached test suites, with separate FFI provider, renderer, and test projects.
+- Fix NuGet trusted publishing authentication and allow retrying existing release packages without rebuilding.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.90.1...0.90.2
+
+### [0.90.1]
+
+- Publish NuGet packages through trusted publishing without a stored API key.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.90.0...0.90.1
+
+### [0.90.0]
+
+- Upgrade the JavaScript compiler to Fable 5.27.0 and Fable.Core 5.6.1.
+- Keep changelog spacing consistent during editing and release preparation.
+- Add default-deny IO, Interactive, Threading, and Native permissions to hosted interpreter execution, including provider and callback checks.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.89.0...0.90.0
+
+## [0.89]
+
+### [0.89.0]
+
+- Remove redundant compiler tests and speed up compiled usage-message coverage.
+- Prevent publishing tests from waiting on output pipes held open by idle build workers.
+- Join unobserved tasks before script and host invocation returns, and collect all foreground and background failures.
+- Put task continuation callbacks first so continueWith, whenAll, and whenAny compose naturally in pipelines.
+- Add Task.delay, Task.fromResult, Task.continueWith, Task.whenAll, Task.whenAny, and Task.awaitAll with debugger, compiler, and editor support.
+- Reject heterogeneous list elements consistently, including tasks with different result types.
+- Keep constant locals captured by nested functions valid during compiler simplification.
+- Preserve function-valued results when compiling task awaits and other generic external calls.
+- Preserve nested task results and enforce task observation at compiled program Run boundaries.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.88.0...0.89.0
+
+## [0.88]
+
+### [0.88.0]
+
+- Keep compiled map string keys in ordinal order independently of the current culture.
+- Expand the pure standard library with scalar math, collection and text helpers, lexical paths, glob matching, SemVer, encodings, and SHA-256, with editor support and website documentation.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.87.2...0.88.0
+
+## [0.87]
+
+### [0.87.2]
+
+- Configure compiler backend, AOT, size optimization, runtime, and output defaults in `fscript.toml`, with CLI overrides and conventional build directories.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.87.1...0.87.2
+
+### [0.87.1]
+
+- Reduce Native AOT executable size and keep only the FFI teapot's target-platform GLFW library when publishing.
+- Add `compile --aot --size-optimized` for smaller executables with invariant globalization and reduced framework diagnostics.
+- Document Native AOT size measurements, publishing profiles, and their tradeoffs on the website.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.87.0...0.87.1
+
+### [0.87.0]
+
+- Present scripting, .NET and JavaScript embedding, and compilation as the three main paths on the website and in the introduction.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.86.3...0.87.0
+
+## [0.86]
+
+### [0.86.3]
+
+- Reduce interpreter allocations for record/map equality and list selection, and speed up LIR list collection and iteration.
+- Speed up parsing, resolved analysis, and compilation of large scripts, reduce wide-tuple inference allocations, and streamline task-sharing closure analysis.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.86.2...0.86.3
+
+### [0.86.2]
+
+- Fix collection callbacks such as List.fold failing in the website sandbox and JavaScript hosts.
+- Upgrade the JavaScript compiler to Fable 5.24.0 and Fable.Core 5.6.0.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.86.1...0.86.2
+
+### [0.86.1]
+
+- Fix FFI compilation across platforms, enable teapot Native AOT builds, add compilation progress, and document fscript.toml support for compile and analyze.
+- Present script iteration, optimized compilation, and typed .NET FFI together on the website homepage and introduction.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.86.0...0.86.1
+
+### [0.86.0]
+
+- Speed up compiled programs with fewer closures and temporary values, fused collection loops, and lower-allocation list operations.
+- Add opt-in, size-bounded FFI IL inlining and reproducible FScript/F# performance benchmarks.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.85.0...0.86.0
+
+## [0.85]
+
+### [0.85.0]
+
+- Add runnable FFI task-sharing samples for unsafe sharing, hidden state, ordered access, and thread-safe effects.
+- Document FFI task-sharing warnings and keep analysis separate from compilation, with built-in console I/O recognized as thread-safe.
+- Add opt-in static warnings for potential FFI sharing across tasks in CLI analysis and interpreted hosting.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.84.0...0.85.0
+
+## [0.84]
+
+### [0.84.0]
+
+- Added C# and .NET compilation with FFI support, self-contained executables, and Native AOT publishing.
+- Added typed HIR/LIR, versioned `.fsir` artifacts, and a reference LIR interpreter, with specialization, `Pure`-guided pruning, common-subexpression elimination, and .NET tail-call optimizations.
+- Added execution-local `Env.setExitCode` and `--no-result` controls, and updated the website and documentation for compilation and embedding.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.83.3...0.84.0
+
+## [0.83]
+
+### [0.83.3]
+
+- Add JavaScript host-type and union registrations, opaque payload round trips, typed function helpers, and script callbacks.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.83.2...0.83.3
+
+### [0.83.2]
+
+- Automatically select each script’s nearest containing FFI manifest in VS Code, isolating sibling environments without manual switching.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.83.1...0.83.2
+
+### [0.83.1]
+
+- Add a Debug Current Script command to the VS Code command palette and editor context menu.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.83.0...0.83.1
+
+### [0.83.0]
+
+- Add CLI and VS Code debugging with expression stepping, safe inspection, native callbacks, independent task control, and configurable CLI selection.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.82.2...0.83.0
+
+## [0.82]
+
+### [0.82.2]
+
+- Show public import aliases instead of internal module names in editor hover signatures.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.82.1...0.82.2
+
+### [0.82.1]
+
+- Load NuGet extension packages from fscript.toml, with optional latest-stable versions, local caching, and shared isolated dependencies for CLI and trusted VS Code environments.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.82.0...0.82.1
+
+### [0.82.0]
+
+- Move extension authoring to the independent FScript.Extensibility SDK; existing providers must rebuild against its stable 1.x API.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.7...0.82.0
+
+## [0.81]
+
+### [0.81.7]
+
+- Fix VS Code provider loading by matching bundled server assembly versions to the published FScript packages.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.6...0.81.7
+
+### [0.81.6]
+
+- Support host-provided union types and F# sets in typed FFI adapters, including editor completion and hover.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.5...0.81.6
+
+### [0.81.5]
+
+- Automatically load fscript.toml beside CLI scripts or in the stdin/REPL working directory, with --no-config to opt out.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.4...0.81.5
+
+### [0.81.4]
+
+- Always use the installed FScript CLI for VS Code’s Run Current Script command, including in the FScript repository.
+- Make direct CLI execution the primary path in the FFI graphics walkthrough.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.3...0.81.4
+
+### [0.81.3]
+
+- Allow the signed macOS CLI to load native provider dependencies signed by other teams.
+- Run the graphics FFI sample directly from FScript and add a VS Code run command that forwards the selected environment.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.2...0.81.3
+
+### [0.81.2]
+
+- Added an OpenGL FFI sample with script-generated teapot geometry, camera, lighting, animation, and an Examples walkthrough.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.1...0.81.2
+
+### [0.81.1]
+
+- Added typed F# host function declarations that derive signatures, arity, and value conversions from handlers.
+- Explained host type and function descriptors alongside the embedding helpers.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.81.0...0.81.1
+
+### [0.81.0]
+
+- Replaced script export attributes with contextual `export let` declarations while keeping `export` available as an identifier.
+- Completed the standard-library and language reference and improved tutorial order, examples, and core-versus-host guidance.
+- Removed the F# TypeProvider package and its compile-time script projection support.
+- Added script-constructible CLR record projections with complete visible-field validation and typed conversion from script-created records.
+- Added opt-in CLR attributes and helpers to derive host-managed descriptors and snapshot visible properties from real host types.
+- Documented host-managed values, extension providers, and shared CLI and VS Code environments.
+- Added shared FFI environment configuration for CLI execution and trusted, workspace-specific VS Code completion and diagnostics.
+- Added host-managed extension types with visible fields, opaque host state, and safe structural reading and transport.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.80.1...0.81.0
+
+## [0.80]
+
+### [0.80.1]
+
+- Fixed VS Code language-server startup failing with an output-channel error after the language-client upgrade.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.80.0...0.80.1
+
+### [0.80.0]
+
+- Updated website and VS Code extension dependencies; the extension now requires VS Code 1.91 or later.
+- Restored build and test compatibility after dependency upgrades by keeping NUnit compatible with FsUnit.
+- Added int, bool, and payload-free union map keys.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.79.0...0.80.0
+
+## [0.79]
+
+### [0.79.0]
+
+- Added VS Code syntax and semantic highlighting for numeric type annotations.
+- Documented numeric specialization and the language type hierarchy.
+- Added the numeric meta-type so arithmetic functions specialize to int or float and reject nonnumeric or mixed operands.
+- Fixed remainder typing to accept integers only, matching runtime behavior.
+- Restored CI builds on current GitHub runners by removing the obsolete F# parallel-compilation switch.
+- Fixed documentation assets and links for hosting the website at `fscript.magnusopera.io`.
+- Rewrote the website around concrete FScript behavior and removed vague product slogans.
+- Fixed oversized homepage headings to wrap in balanced lines across desktop widths.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.78.1...0.79.0
+
+## [0.78]
+
+### [0.78.1]
+
+- Fixed npm release publishing to grant the provenance identity permission required by GitHub Actions.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.78.0...0.78.1
+
+### [0.78.0]
+
+- Fixed concurrent type inference potentially reusing fresh type-variable identities.
+- Updated the Fable compiler, core library, and packaging SDK to their latest stable releases.
+- Kept language-server hints responsive in erroneous files by inferring each recoverable declaration only once.
+- Made REPL and JavaScript sessions infer and evaluate new submissions incrementally instead of replaying session history.
+- Reduced type inference allocation by avoiding no-op substitution, environment, generalization, and record-key work.
+- Reduced script type-checking overhead by skipping editor-only local-variable telemetry during ordinary inference.
+- Speed up non-recursive filesystem enumeration patterns without changing their results.
+- Fixed the documentation site to identify the latest released version as actively maintained.
+- Restored the unreleased-version notice on the `Next` documentation.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.77.1...0.78.0
+
+## [0.77]
+
+### [0.77.1]
+
+- Fixed macOS notarization on current GitHub runners by using the active Xcode notary tool instead of a removed hard-coded Xcode version.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.77.0...0.77.1
+
+### [0.77.0]
+
+- Redesigned the documentation website as an example-led product showcase with clearer learning and embedding paths.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.76.0...0.77.0
+
+## [0.76]
+
+### [0.76.0]
+
+- Fixed macOS release signing to use the explicit arm64 code-signing identifier.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.75.0...0.76.0
+
+## [0.75]
+
+### [0.75.0]
+
+- Kept npm package publishing in the release publication workflow alongside NuGet publishing.
+- Added npm publishing for the Fable JavaScript package when a release is published.
+- Added npm package tarballs to draft release assets so the JavaScript package can be audited before publishing.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.74.0...0.75.0
+
+## [0.74]
+
+### [0.74.0]
+
+- Added a Fable-compiled JavaScript embedding package for running FScript in Node and browser-compatible ESM hosts.
+- Added website documentation and a browser sandbox for the Fable JavaScript FScript runtime.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.73.0...0.74.0
+
+## [0.73]
+
+### [0.73.0]
+
+- Hardened filesystem sandboxing so imports and runtime filesystem externs reject symlink/reparse-point paths and do not traverse unsafe directories.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.72.0...0.73.0
+
+## [0.72]
+
+### [0.72.0]
+
+- Removed macOS Intel release packaging from the release publish workflows and Homebrew asset generation.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.71.1...0.72.0
+
+## [0.71]
+
+### [0.71.1]
+
+- Fixed LSP go-to-definition for imported union-case usages so constructors like `IdentifierToken` navigate to the declaring case in the imported file instead of failing or landing on the enclosing type header.
+- Fixed LSP go-to-definition near dotted injected calls so clicks on `Map.add` no longer jump to an adjacent local argument binding.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.71.0...0.71.1
+
+### [0.71.0]
+
+- Moved `Task.spawn` and `Task.await` into the default runtime extern registry so embedding hosts can disable task concurrency helpers.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.70.0...0.71.0
+
+## [0.70]
+
+### [0.70.0]
+
+- Fixed LSP injected-function navigation so namespaced stdlib and runtime functions like `Console.*`, `Task.*`, and `Map.*` resolve to virtual stdlib sources, and `print` is no longer treated as available.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.69.0...0.70.0
+
+## [0.69]
+
+### [0.69.0]
+
+- Added `Console.writeLine` and `Console.readLine` runtime externs and switched samples/docs from the old `print` builtin to `Console.writeLine`.
+- Added a vintage BASIC interpreter sample under `samples/basic`.
+- Added unit-parameter function syntax so scripts can define zero-argument functions with `let f () = ...` and `fun () -> ...`.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.68.0...0.69.0
+
+## [0.68]
+
+### [0.68.0]
+
+- Added native `Task.spawn` and `Task.await` support with `'a task` types for concurrent thunk execution.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.67.1...0.68.0
+
+## [0.67]
+
+### [0.67.1]
+
+- Clarified the website docs so `import` is documented as a language feature and `[<export>]` as an embedding feature.
+- Added a `What's New` docs page and sidebar section that mirrors release notes from the changelog.
+- Scoped `What's New` so `Next` shows `Unreleased` notes while versioned docs show only the matching release notes.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.67.0...0.67.1
+
+### [0.67.0]
+
+- Fixed the resolver-backed embedding docs to normalize virtual import paths so the sample works on Windows as well as Unix.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.66.0...0.67.0
+
+## [0.66]
+
+### [0.66.0]
+
+- Moved website publishing into the primary release workflow so docs deploy with the rest of the published release pipeline.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.65.0...0.66.0
+
+## [0.65]
+
+### [0.65.0]
+
+- Changed website publishing to deploy docs on GitHub release publication instead of on tag push.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.64.0...0.65.0
+
+## [0.64]
+
+### [0.64.0]
+
+- Added optional list index access with `list[index]` plus the `List.tryItem` stdlib helper.
+- Expanded stdlib docs with built-in `Env` coverage, complete top-level module reference pages, and a dedicated native-types/indexer reference.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.63.0...0.64.0
+
+## [0.63]
+
+### [0.63.0]
+
+- Documented the CLI-injected `Env` value and stdlib `Environment`/`FsKind` types, and filled missing stdlib reference entries such as `String.endsWith`.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.62.0...0.63.0
+
+## [0.62]
+
+### [0.62.0]
+
+- Packaged the `fscript` CLI as the `MagnusOpera.FScript` .NET tool, added it to `make pack-nuget`, and documented .NET tool installation and update flows.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.61.0...0.62.0
+
+## [0.61]
+
+### [0.61.0]
+
+- Fixed JSON and XML record deserialization to treat missing optional fields as `None` instead of failing the whole decode.
+- Updated GitHub Actions .NET setup to use SDK `10.0.201`.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.60.1...0.61.0
+
+## [0.60]
+
+### [0.60.1]
+
+- Fixed website release builds to mark the pushed tag as the latest docs version so freshly released docs do not show the unmaintained-version banner.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.60.0...0.60.1
+
+### [0.60.0]
+
+- Added a new `MagnusOpera.FScript.TypeProvider` package that type-checks scripts at compile time and exposes exported functions as strongly-typed F# members with runtime signature compatibility checks.
+- Stabilized type-provider integration tests in CI by hardening spawned `dotnet` process handling and adding job-level CI timeouts to prevent long hangs.
+- Added a Docusaurus-based documentation website under `website/` focused on FScript language learning, examples, and embedding guidance.
+- Added tag-triggered GitHub Pages deployment and release-time docs version snapshotting for the website.
+- Expanded website content with didactic language chapters, embedded runnable examples, detailed stdlib reference, VS Code/Open VSX setup, and practical embedding/type-provider guides.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.59.0...0.60.0
+
+## [0.59]
+
+### [0.59.0]
+
+- Removed the obsolete `Stdlib` shim module and switched embedded-source import errors to generic wording now that stdlib is fully native.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.58.0...0.59.0
+
+## [0.58]
+
+### [0.58.0]
+
+- Added `String.endsWith` to the language/runtime built-ins with corresponding type inference support.
+- Optimized runtime invocation paths by reducing argument list churn and improving closure application in `Eval.invokeValue`.
+- Cached stdlib loading and reserved-name computation to avoid repeated parse/inference work.
+- Optimized `ScriptHost` exported symbol access by caching function/value sets and maps for faster `invoke` and `getValue`.
+- Moved stdlib `List.*`, `Option.*`, `Map.*`, `Environment`, and `FsKind` definitions to native language/runtime built-ins to remove stdlib source parsing/inference at load time.
+- Removed virtual stdlib source navigation plumbing from LSP (`fscript/stdlibSource`) and updated injected symbol/type resolution to rely on native built-in metadata.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.57.0...0.58.0
+
+## [0.57]
+
+### [0.57.0]
+
+- Replaced `Xml.deserialize` with `Xml.queryValues` for explicit value extraction from XML strings.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.56.0...0.57.0
+
+## [0.56]
+
+### [0.56.0]
+
+- Removed `Xml.serialize` from runtime externs; `Xml.deserialize` remains available.
+- Made `String.replace`, `String.indexOf`, `String.substring`, and `String.split` consistently pipeline-friendly by using data-last argument order.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.55.0...0.56.0
+
+## [0.55]
+
+### [0.55.0]
+
+- Escaped pretty-printed string values (including map string keys) so interpolated strings with embedded quotes render unambiguously in CLI/REPL output.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.54.2...0.55.0
+
+## [0.54]
+
+### [0.54.2]
+
+- Fixed release marketplace publish jobs to checkout the repository before running local publish scripts.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.54.1...0.54.2
+
+### [0.54.1]
+
+- Fixed NuGet packaging to include the custom package readme as `README.md` so `PackageReadmeFile` validation succeeds during pack/publish.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.54.0...0.54.1
+
+### [0.54.0]
+
+- Split VS Code Marketplace and Open VSX publishing into separate release jobs and added idempotent publish scripts so duplicate-version reruns succeed while real publish errors still fail.
+- Updated package/readme wording from `immutable-first` to `immutable-by-design` to reflect immutable-only semantics.
+- Switched NuGet package readme for `MagnusOpera.FScript.Language` and `MagnusOpera.FScript.Runtime` to a targeted `NUGET.md` with logo, overview, rationale, and license.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.53.0...0.54.0
+
+## [0.53]
+
+### [0.53.0]
+
+- Switched sandbox deny configuration to root-relative glob patterns (`HostContext.DeniedPathGlobs`), including support for `.git` and `**/node_modules` style blocking.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.52.0...0.53.0
+
+## [0.52]
+
+### [0.52.0]
+
+- Added `Json.serialize` and `Xml.serialize` externs for option-based JSON/XML serialization in runtime hosts.
+- Renamed XML decode extern from `Xml.values` to `Xml.deserialize`.
+- Replaced `Fs.isFile` and `Fs.isDirectory` with `Fs.kind` returning stdlib union `FsKind` (`File`/`Directory`/`Missing`) for direct pattern matching.
+- Added host-configurable sandbox exclusions (`HostContext.ExcludedPaths`) so `Fs.glob`/`Fs.enumerateFiles` hide blocked entries and `Fs.readText`/`Fs.writeText`/`Fs.createDirectory` fail immediately on blocked paths.
+- Added built-in `String.*` helpers: `replace`, `indexOf`, `toLower`, `toUpper`, `substring`, `concat`, and `split`.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.51.0...0.52.0
+
+## [0.51]
+
+### [0.51.0]
+
+- Added CLI extern configuration flags (`--no-default-externs`, repeatable `--extern-assembly`) with attribute-based provider discovery and conflict validation.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.50.0...0.51.0
+
+## [0.50]
+
+### [0.50.0]
+
+- Fixed parser handling for record fields whose value expression starts on a deeper indented line (for example `Operations =` followed by a multiline compact list literal).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.49.0...0.50.0
+
+## [0.49]
+
+### [0.49.0]
+
+- Fixed `if ... then ... else` parsing when branches contain compact multiline list literals with nested record items.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.48.1...0.49.0
+
+## [0.48]
+
+### [0.48.1]
+
+- Made unsigned macOS release-asset cleanup best-effort so transient GitHub API failures no longer fail the release workflow.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.48.0...0.48.1
+
+### [0.48.0]
+
+- Switched VS Code extension changelog to a symlink of root `CHANGELOG.md` so Marketplace/Open VSX release notes use a single shared source.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.47.0...0.48.0
+
+## [0.47]
+
+### [0.47.0]
+
+- Publishing to tap requires only sign artifacts.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.46.0...0.47.0
+
+## [0.46]
+
+### [0.46.0]
+
+- Fixed lexer indentation handling for compact list layouts with multiple multiline record items so Terrabuild-style operation lists parse without inconsistent-indentation errors.
+- Enforced compact delimiter layout for non-empty `{...}` and `[...]` forms so opening/closing braces or brackets cannot appear on their own lines.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.45.0...0.46.0
+
+## [0.45]
+
+### [0.45.0]
+
+- Fixed parser/LSP false "Block cannot end with a let binding" errors for block-scoped `let` values that contain multiline expression continuations (for example list literals with multiline record items).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.44.0...0.45.0
+
+## [0.44]
+
+### [0.44.0]
+
+- Added `samples/quicksort.fss` with a recursive quicksort example over integer lists.
+- Added let-function return type annotations (`let f ... : Type = ...`) with parser/type-inference support and updated annotation specifications.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.43.0...0.44.0
+
+## [0.43]
+
+### [0.43.0]
+
+- Switched LSP local go-to-definition to lexical AST binding resolution so local symbol usages (including record-field values and edge-of-token clicks) resolve to their exact nearest binder.
+- Added `fscript.server.logLevel=debug` support to surface detailed definition/references diagnostics and refined definition-follow-up references suppression so declaration clicks still show references while usage clicks navigate reliably.
+- Fixed local match-pattern declaration clicks (for example `Some batch`) to stop jumping to first usage and preserve references-window behavior.
+- Updated debug logging output to emit LSP `window/logMessage` entries when `fscript.server.logLevel=debug`, so logs are visible in editor output.
+- Fixed LSP definition on member-access field names (for example `batch.ProjectPaths`) to resolve via qualifier type inference (including match-pattern-bound locals).
+- Updated top-level function declaration clicks to preserve references-window behavior by keeping declaration entries in immediate follow-up reference results.
+- Fixed LSP reference indexing to include `nameof <symbol>` occurrences so top-level declaration clicks surface `nameof` usages in the references window.
+- Added an independent VS Code/LSP toggle for hover hints so it can be enabled or disabled without disabling the language server.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.42.0...0.43.0
+
+## [0.42]
+
+### [0.42.0]
+
+- Added LSP go-to-definition support for local and pattern-bound variable bindings so usages navigate to the nearest in-scope declaration (including function parameters and tuple `let` destructuring names).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.41.0...0.42.0
+
+## [0.41]
+
+### [0.41.0]
+
+- Added `Int/Float/Bool` conversion helpers in stdlib-style builtins (`*.tryParse` and `*.toString`) for safe scalar parsing and string formatting.
+- Added tuple let destructuring (`let (a, b) = ...`) for top-level, block, and let-expression non-rec bindings.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.40.0...0.41.0
+
+## [0.40]
+
+### [0.40.0]
+
+- Fixed VS Code/LSP analysis to inject a default `Env` binding so scripts using `Env` no longer show unbound-variable diagnostics in the editor.
+- Fixed VS Code/LSP type navigation so `Env` and `Environment` resolve to the stdlib `Environment` type definition.
+- Added CLI script argument forwarding with `--` and injected `Env` metadata (`ScriptName`, `Arguments`) for file, stdin, and REPL execution modes, with `Environment` now defined in stdlib for LSP/type visibility.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.39.0...0.40.0
+
+## [0.39]
+
+### [0.39.0]
+
+- Added VS Code REPL commands to open FScript REPL, send selected code to REPL, and execute the current script in REPL from the editor.
+- Updated VS Code REPL launch to default to `auto`, preferring local workspace CLI (`dotnet run --project src/FScript`) before falling back to `fscript` on PATH.
+- Fixed VS Code REPL script/selection sending to dedent multiline snippets and wrap non-`let` snippets in an inner `let` value block, avoiding premature line-by-line execution and indentation/parser errors for selected inner content while keeping atomic execution and persisting only pure single-`let` selections.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.38.3...0.39.0
+
+## [0.38]
+
+### [0.38.3]
+
+- Updated changelog gating and release preparation so release commits can leave `## [Unreleased]` empty without placeholder bullets.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.38.2...0.38.3
+
+### [0.38.2]
+
+- Fixed `release-prepare` changelog rendering so the post-release initialization bullet stays under `## [Unreleased]` instead of being appended to the released section.
+- Initialize post-0.38.1 unreleased section.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.38.1...0.38.2
+
+### [0.38.1]
+
+- Fixed release preparation to auto-seed `## [Unreleased]` with a post-release initialization bullet so changelog CI checks continue to pass after tagging.
+- Initialize post-0.38.0 unreleased section.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.38.0...0.38.1
+
+### [0.38.0]
+
+- Restricted `make release-prepare` to stable versions only (`major.minor.build`) and removed `-next` support from release docs and validation.
+- Added REPL documentation under guides and architecture, and updated the getting-started tutorial to include a REPL check right after install.
+- Added `make release-prepare` to automate changelog versioning, compare link generation, release commit, and local tag creation.
+- Release tag workflow now populates draft release notes from the matching `CHANGELOG.md` version section and fails fast when it is missing or invalid.
+- Initialize post-0.37.0 unreleased section.
+- Added CLI stdin execution support so scripts can be piped to `fscript` (including `-r/--root` overrides).
+- Added `fscript version` command to print the current CLI version.
+- Added interactive CLI REPL mode when running `fscript` without arguments.
+- Updated REPL multiline submission to require double-Enter for pending blocks and improved function display with typed signatures.
+- Fixed block semantics to reject trailing `let`-only blocks without a final expression (for example `let a = let f x = ...`) and require an explicit return expression.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.37.0...0.38.0
+
+## [0.37]
+
+### [0.37.0]
+
+- Added resolver-backed import loading APIs (`parseSourceWithIncludesResolver` and `ScriptHost.loadSourceWithIncludes`) for hosts that load scripts from non-file sources.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.36.0...0.37.0
+
+## [0.36]
+
+### [0.36.0]
+
+- Fixed LSP go-to-definition for alias-qualified function calls (for example `Helpers.append_part`).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.35.0...0.36.0
+
+## [0.35]
+
+### [0.35.0]
+
+- Fixed LSP completion insertion for dotted prefixes so selecting `Option.map` after `Option.` no longer duplicates the qualifier.
+- Switched import syntax to `import "path.fss" as Alias` and removed `from` import grammar.
+- Updated LSP type display/navigation to hide internal import prefixes and use source aliases (for example `Common.ProjectInfo`).
+- Renamed sample `includes-and-exports.fss` to `imports-and-exports.fss` and updated docs links.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.34.0...0.35.0
+
+## [0.34]
+
+### [0.34.0]
+
+- Removed F# sources from `src/FScript.LanguageServer*` by moving LSP semantic modules into `FScript.CSharpInterop` and keeping `FScript.LanguageServer` as C# host.
+- Replaced `FScript.LanguageServer.Tests` project with a C# test project and C# LSP test harness to remove F# compile cost from LanguageServer test builds.
+- Deleted obsolete F# LanguageServer test sources after C# test project migration.
+- Renamed `FScript.CSharpInterop/LanguageServerLegacy` to `FScript.CSharpInterop/LanguageServer` to reflect the new primary architecture.
+- CI now runs branch update builds on PR `synchronize` events while keeping `ci-main` scoped to `main` pushes to avoid duplicate runs.
+- Enabled F# preview parallel compilation globally, disabled deterministic builds, and removed global RuntimeIdentifiers to reduce CI build latency.
+- Added `FScript.CSharpInterop` as a stable bridge for parse/infer/runtime-extern/stdlib-source services and wired LanguageServer through it.
+- Added `FScript.LanguageServer` host executable as the migration entrypoint for C#-owned LSP startup.
+- Added a first native C# LSP server core (JSON-RPC transport, initialize/shutdown, text sync, and stdlib-source request) with dedicated integration tests.
+- Extended the native C# LSP core with diagnostics publishing and `viewAst`/`viewInferredAst` command handling.
+- Switched C# LSP host to full-method dispatch parity via shared handlers, made it the default test target, and updated extension/tag packaging to use `FScript.LanguageServer.dll`.
+- Replaced the F# LSP server executable with `FScript.LanguageServer` (C#) and moved F# LSP logic into `FScript.LanguageServer.Core`.
+- Fixed imported qualified type annotations (for example `common.ProjectInfo`) in parser/type inference to prevent false type mismatches.
+- Fixed LSP inlay hints to ignore spans from other files so included symbols no longer leak labels into unrelated declarations.
+- Enforced string-only map keys across type inference, evaluation, samples, and LSP type rendering (removed `int|string` key-domain displays).
+- Fixed map-pattern inlay hints to infer key/value/tail bindings (`string`, `int`, `int map`) instead of `unknown`.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.33.0...0.34.0
+
+## [0.33]
+
+### [0.33.0]
+
+- Updated runtime/test project package versions after NuGet publish verification.
+- Enforced strict changelog gates in CI (PR + main) and added `make verify-changelog` local preflight.
+- Optimized `FScript.LanguageServer.Tests` startup by building the language server once per run instead of once per test.
+- Reused a single LSP server process across `FScript.LanguageServer.Tests` and added per-test document cleanup for isolation, reducing suite runtime substantially.
+- Removed `clean` from `publish-all` to avoid redundant CI cleanup, restored one LSP process per test for stronger isolation (while keeping build-once), and explicitly disabled AOT for LanguageServer publish.
+- Split `FScript.LanguageServer.Tests` into feature-oriented files with shared wire/client/fixture helpers to reduce CI compile bottlenecks from the previous monolithic test file.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.32.0...0.33.0
+
+## [0.32]
+
+### [0.32.0]
+
+- Replaced `#include` with `import` and removed script-level `module` declarations.
+- Imported files are now exposed through filename-derived modules (for example `shared.fss` -> `shared.*`).
+- Updated parser/runtime/LSP/docs/tests for the new import/module semantics.
+- Removed `unused` top-level binding diagnostics from LSP.
+- Clarified `AGENTS.md` so every direct commit to `main` must include an `Unreleased` changelog entry, including docs/process/policy updates.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.31.0...0.32.0
+
+## [0.31]
+
+### [0.31.0]
+
+- Enforced warning-as-error globally via `Directory.Build.props` (`TreatWarningsAsErrors=true`).
+- Fixed LSP compiler warnings (exhaustive `SInclude` matches and null-safe stdlib resource stream handling).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.30.0...0.31.0
+
+## [0.30]
+
+### [0.30.0]
+
+- Added contributor policy in `AGENTS.md` for build/test/non-regression workflow.
+- Added CI changelog gate requiring one-line `## [Unreleased]` entries for functional PR changes.
+- Reorganized documentation into `docs/specs`, `docs/architecture`, and curated root `docs/` guides.
+- Added docs indexes (`docs/README.md`, `docs/specs/README.md`, `docs/architecture/README.md`) and linked README/tutorial to the new structure.
+- Added `docs/specs/lsp-inlay-hints.md` and mandated specification maintenance in `AGENTS.md`.
+- LSP now injects runtime extern schemes for document typing, enabling host functions (`Fs.*`, `Regex.*`, etc.) and showing injected signatures in hover/completion/signature help.
+- LSP definition/type-definition navigation now targets included declaration files (URI derived from symbol source span) instead of always the current file.
+- LSP now resolves record field labels inside function return record literals to the function’s declared/inferred return type (including include-provided type definitions).
+- Suppressed misleading top-level `unused` diagnostics for underscore helper/include files (for example `_helpers.fss`).
+- LSP hover/signature for injected stdlib functions now shows named arguments (for example `Option.map` mapper/value labels).
+- LSP definition on injected stdlib functions now opens readonly virtual stdlib sources (`fscript-stdlib:///Option.fss`, `List.fss`, `Map.fss`).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.29.0...0.30.0
+
+## [0.29]
+
+### [0.29.0]
+
+- Improved LSP inlay/type rendering for map-related inference (`int|string` map-key domain and `unknown map` display).
+- Added LSP inlay type hints for pattern-bound variables (for example `| Some x ->` now shows `x: int`).
+- Added regression coverage for map-key/type inlay rendering and option-pattern variable inlay hints.
+
+## [0.28]
+
+### [0.28.0]
+
+- Added local variable type hover in LSP.
+- Added local variable type capture in type inference.
+- Added VS Code extension auto-compile for development startup.
+
+## [0.27]
+
+### [0.27.0]
+
+- Added structural update syntax support with `with` inside structural literals: `{| base with Field = value |}`.
+- Structural updates can add new fields and work with multiline layout.
+- Added parser/type/eval regression coverage for structural record update semantics.
+
+## [0.26]
+
+### [0.26.0]
+
+- Split record literals: `{ ... }` is nominal (must match one declared record type), while `{| ... |}` is structural.
+- Improved type identity and LSP navigation for records (definition/type-definition from annotations, record literal fields, and parameter usages).
+- Added sample and regression coverage for annotation/literal semantics and record navigation (`samples/annotations-and-matching.fss`, language + LSP tests).
+
+## [0.25]
+
+### [0.25.0]
+
+#### Extension
+
+- Fix nullness warnings.
+- Implemented analysis state.
+
+## [0.24]
+
+### [0.24.0]
+
+#### Tooling
+
+- Added first-party VS Code extension (`vscode-fscript`) with:
+  - FScript syntax highlighting.
+  - Language Server features: diagnostics, completion, hover, symbols, go-to-definition, type-definition, references, rename, inlay hints, semantic tokens, quick fixes, and include-path navigation.
+  - Extension status bar + output channel integration.
+- Added automatic .NET runtime acquisition support for the extension via `.NET Install Tool` integration (with PATH fallback).
+- Added tag-only publish workflow to distribute the extension to VS Code Marketplace and Open VSX.
+
+#### Documentation
+
+- Added dedicated map matching reference: `docs/map-matching-reference.md`.
+- Added include-resolution details (path normalization, root confinement, include deduplication, file-aware errors) in `docs/syntax-and-indentation.md`.
+- Added embedding cookbook section to `docs/embedding-fscript-language.md`.
+- Added and expanded onboarding tutorial and README navigation polish.
+
+## [0.23]
+
+### [0.23.1]
+
+_Published: 2026-02-12_
+
+  - Added comprehensive Getting Started tutorial (docs/getting-started-tutorial.md) with progressive onboarding: install, basic/flow types, pattern matching, partial matching,
+    recursion, stdlib, includes/modules, exports, and hosting/security.
+  - Reworked README to prioritize onboarding:
+      - dedicated Getting Started Tutorial section
+      - repository development instructions moved after install/tutorial content
+      - clarified stdlib vs host externs (List.*, Map.*, Option.* are prelude stdlib).
+  - Minor docs polish and navigation improvements:
+      - better cross-links between tutorial, samples, and reference docs.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.23.0...0.23.1
+
+### [0.23.0]
+
+_Draft_
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.22.0...0.23.0
+
+## [0.22]
+
+### [0.22.0]
+
+_Published: 2026-02-11_
+
+  - Added generic map key support for string and int in FScript.
+  - Kept {} polymorphic and inference-driven, so it resolves by usage.
+  - Updated map indexer, map pattern matching, and map spread typing to work with typed keys.
+  - Added validation errors for unsupported map key types.
+  - Updated tests and samples behavior accordingly; full test suite and smoke tests pass.
+  - Updated documentation.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.21.0...0.22.0
+
+## [0.20]
+
+### [0.20.0]
+
+_Published: 2026-02-11_
+
+  - Improved map match semantics to support intuitive key-based lookup patterns.
+  - Added support for multi-key map patterns, with optional ..tail.
+  - Preserved dynamic extraction patterns ({ [k] = v; ..tail }).
+  - Added map-pattern sample (samples/map-matching.fss) and updated syntax/tests accordingly.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.19.0...0.20.0
+
+## [0.19]
+
+### [0.19.0]
+
+_Published: 2026-02-11_
+
+  - Added when guards to match cases (| pattern when condition -> expr).
+  - Guards are type-checked as bool and evaluated after pattern binding.
+  - Works uniformly across list, record, tuple, union, and map patterns.
+  - Added tests and docs updates, plus a sample demonstrating guarded map matching.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.18.0...0.19.0
+
+## [0.18]
+
+### [0.18.0]
+
+_Published: 2026-02-11_
+
+  - Added native map spread/update syntax: { [k] = v; ..tail } and { ..tail }.
+  - Removed map support from @; append is now list-only.
+  - Updated Map stdlib internals to use spread syntax.
+  - Added parser/type/eval tests for map spread and map-append rejection.
+  - Updated docs and types-showcase sample to reflect the new map update style.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.17.0...0.18.0
+
+## [0.17]
+
+### [0.17.0]
+
+_Published: 2026-02-11_
+
+  - Added #include "file.fss" support with cycle detection, sandbox-aware path checks, and file-aware error reporting.
+  - Added module support for included scripts (module Foo) with scoped symbol resolution.
+  - Introduced a protected built-in stdlib prelude and migrated List/Option core functions from runtime externs to stdlib scripts.
+  - Added map pattern matching ({} and { [k] = v; ..tail }) and migrated map helpers to stdlib, removing collection extern files.
+  - Updated samples/docs to cover includes, modules, and map matching.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.16.0...0.17.0
+
+## [0.16]
+
+### [0.16.0]
+
+_Published: 2026-02-10_
+
+  - Added attribute-based exports with [<export>] (case-sensitive), replacing export let.
+  - Added qualified discriminated union support:
+      - constructor usage with Type.Case
+      - match patterns with Type.Case
+  - Preserved backward compatibility for unqualified DU cases (Case still works).
+  - Extended parser/type-inference/eval test coverage for export attributes and qualified DU behavior.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.15.2...0.16.0
+
+## [0.15]
+
+### [0.15.2]
+
+_Published: 2026-02-10_
+
+- Update README.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.15.1...0.15.2
+
+### [0.15.0]
+
+_Published: 2026-02-10_
+
+  - Added NuGet package icon metadata for MagnusOpera.FScript.Language and MagnusOpera.FScript.Runtime.
+  - Updated README.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.14.0...0.15.0
+
+## [0.14]
+
+### [0.14.0]
+
+_Published: 2026-02-10_
+
+  - Added support for multiline lambda bodies inside parenthesized call chains, including correct pipeline continuation after ).
+  - Added support for aligned multiline let parameter declarations (strict column alignment).
+  - Tightened layout rules for multiline literals and inline record type annotations.
+  - Improved parse diagnostics for layout issues: misindented expressions now report explicit indentation errors instead of generic unexpected-token errors.
+  - Updated syntax/indentation documentation and parser regression tests accordingly.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.13.0...0.14.0
+
+## [0.13]
+
+### [0.13.0]
+
+_Published: 2026-02-09_
+
+  - Added support for multiline lambda bodies inside parenthesized call chains, including pipeline continuation after ).
+  - Added parser tests for multiline lambda/pipeline behavior.
+  - Added support for aligned multiline let parameter declarations with strict column alignment.
+  - Tightened indentation/layout rules for multiline literals and inline record annotation shapes.
+  - Updated syntax-and-indentation.md with the new accepted layouts and multiline lambda examples.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.12.0...0.13.0
+
+## [0.12]
+
+### [0.12.0]
+
+_Published: 2026-02-09_
+
+  - Added newline-separated multiline layouts for map, record, list literals, record updates, and inline record type annotations.
+  - Kept semicolon-separated syntax fully compatible.
+  - Added parser tests and a new samples/layout-styles.fss.
+  - Updated syntax docs and showcase examples.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.10.0...0.12.0
+
+## [0.11]
+
+### [0.11.0]
+
+_Published: 2026-02-08_
+
+- Fix fscript macOS binary identifier
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.9.0...0.11.0
+
+## [0.10]
+
+### [0.10.0]
+
+_Published: 2026-02-08_
+
+  - Added List.empty (arity-0 value, like Map.empty).
+  - Added Map.map (maps values only) and Map.iter.
+  - Registered new externs in runtime registry.
+  - Added tests for new extern behavior and registry exposure.
+  - Updated docs for extern catalog and map/list value semantics.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.9.0...0.10.0
+
+## [0.9]
+
+### [0.9.0]
+
+_Published: 2026-02-08_
+
+- Unified map literals with brace syntax.
+- Added key-expression support in map literals.
+- Completed parser/tests/docs updates for the new map syntax.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.8.0...0.9.0
+
+## [0.8]
+
+### [0.8.0]
+
+_Published: 2026-02-08_
+
+- Fixed inference for unannotated record field access in Option.map lambdas.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.7.0...0.8.0
+
+## [0.7]
+
+### [0.7.0]
+
+_Published: 2026-02-08_
+
+- Targeted FScript.Language and FScript.Runtime to netstandard2.1.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.6.0...0.7.0
+
+## [0.6]
+
+### [0.6.0]
+
+_Draft_
+
+- Added non-empty list pattern support.
+- Improved multiline lambda application robustness.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.5.0...0.6.0
+
+## [0.5]
+
+### [0.5.0]
+
+_Published: 2026-02-08_
+
+  - Enforced explicit tuple syntax in match cases.
+  - Added multi-parameter lambda syntax support.
+  - Improved host integration:
+      - exposed exported function signatures,
+      - accepted host record maps in map externs.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.4.0...0.5.0
+
+## [0.4]
+
+### [0.4.0]
+
+_Published: 2026-02-08_
+
+ - Added native map literal syntax #{ ... }.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.3.0...0.4.0
+
+## [0.3]
+
+### [0.3.0]
+
+_Draft_
+
+- Treated arity-0 externs and exports as values (not callable functions).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.2.0...0.3.0
+
+## [0.2]
+
+### [0.2.0]
+
+_Published: 2026-02-08_
+
+  - Added script host invocation API.
+  - Added top-level export let metadata and restricted host visibility to exported bindings.
+  - Refactored higher-order externs to callback-based runtime handlers.
+  - Added nameof.
+  - Added Map.ofList, multiline argument support, and extended map APIs (count/filter/fold/choose + try-get rename work).
+  - Added root-confined filesystem write externs.
+  - Added smoke-tests and updated export/host documentation.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.1.4...0.2.0
+
+## [0.1]
+
+### [0.1.4]
+
+_Published: 2026-02-07_
+
+  - Updated entitlements.
+  - Added embedding documentation.
+  - Added distribution setup for NuGet and Homebrew.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.1.3...0.1.4
+
+### [0.1.3]
+
+_Published: 2026-02-07_
+
+ - Fixed token issue affecting tap publishing.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.1.2-next...0.1.3
+
+### [0.1.3-next]
+
+_Pre-release Published: 2026-02-07_
+
+- No code changes vs 0.1.3 (tag points to same commit).
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.1.2-next...0.1.3-next
+
+### [0.1.2-next]
+
+_Pre-release Published: 2026-02-07_
+
+- Fixed Homebrew tap publishing.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.1.1-next...0.1.2-next
+
+### [0.1.1-next]
+
+_Pre-release Published: 2026-02-07_
+
+  - Fixed missing entitlement in macOS signing/publish flow.
+  - Ensured signed macOS artifacts can be produced correctly in CI.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/compare/0.1.0-next...0.1.1-next
+
+### [0.1.0-next]
+
+_Pre-release Published: 2026-02-07_
+
+  - Added publishing/distribution groundwork.
+  - Introduced CLI parsing updates and root-directory behavior.
+  - Renamed projects and improved docs.
+  - Added macOS signing/versioning alignment and fixed build warnings.
+  - Switched license to MIT.
+
+**Full Changelog**: https://github.com/MagnusOpera/FScript/commits/0.1.0-next

@@ -1,0 +1,46 @@
+name: Extension CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+    inputs:
+      release_tag:
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag && format('refs/tags/{0}', inputs.release_tag) || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Read pinned server SDK
+        id: server
+        run: node -e 'console.log("sdk=" + require("./language-server.json").sdk)' >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ steps.server.outputs.sdk }}
+      - run: npm ci
+      - run: npm test
+      - run: npm run prepare:server
+      - run: npm run package
+      - name: Verify packaged extension
+        run: node scripts/verify-vsix.mjs "fscript-$(node -p 'require("./package.json").version').vsix"
+      - name: Verify sources remain unchanged
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-vsix
+          path: '*.vsix'
+          if-no-files-found: error

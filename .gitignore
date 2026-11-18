@@ -1,0 +1,8 @@
+node_modules/
+dist/
+server/
+.build/
+.out/
+*.vsix
+TestResults/
+.DS_Store
