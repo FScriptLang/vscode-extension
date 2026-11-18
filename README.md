@@ -65,10 +65,11 @@ The extension keeps the existing `MagnusOpera.fscript` identity and publishes
 under the Magnus Opera umbrella. FScript no longer builds or publishes VSIX
 artifacts. Extension releases are independent of language releases.
 
-1. Set this repository's `OPEN_VSX_TOKEN` Actions secret. Marketplace uses
+1. Set `OPEN_VSX_TOKEN` in this repository's `release` environment. Restrict that
+   environment to `main` and `v*` tags in GitHub's deployment rules. Marketplace uses
    Trusted Publishing through GitHub OIDC, with the policy configured for
-   `FScriptLang/vscode-extension` and `.github/workflows/release.yml`. The
-   marketplace job requests `id-token: write` and runs `vsce publish --oidc`;
+   `FScriptLang/vscode-extension`, `.github/workflows/release.yml`, and environment
+   `release`. The marketplace job requests `id-token: write` and runs `vsce publish --oidc`;
    no Marketplace token or Azure login is used.
 2. Update `language-server.json` when adopting a new language release: pin its
    exact commit, numeric package version, SDK, and runtime together. Keep the
@@ -85,7 +86,11 @@ Main pushes and pull requests only test and produce an installable VSIX artifact
 No marketplace publication happens on main. The manual **Publish Extension**
 workflow accepts an existing extension tag for retries, checking out that exact
 tag even when dispatched from main. Already-published marketplace versions are
-accepted on retries. No registry secrets are required in MagnusOpera/FScript.
+accepted on retries. Only the extension's restricted `release` environment holds
+`OPEN_VSX_TOKEN`. Do not duplicate it as a repository or organization secret,
+which a modified same-repository PR could read without entering an environment.
+PR validation uses read-only permissions and does not request publishing OIDC
+tokens.
 
 The initial manifest version is 0.94.3, already used by the existing extension.
 Do not create a release tag for that version here; use a new version for the
@@ -145,7 +150,7 @@ Automatic selection uses the `fscript.toml` beside the script, or the nearest co
 
 Configured paths resolve from the manifest directory. With no explicit root, selected editor environments use the workspace folder, while the CLI keeps its normal script/current-directory default. Run the same environment with `fscript --config ./fscript.toml script.fss`. Editor REPL commands do not automatically adopt it.
 
-Configured DLLs execute registration code and require workspace trust. Changes to saved manifests or provider DLLs restart only the affected server and reanalyze open buffers. On Windows, stop the server with `fscript.lsp.enabled` before rebuilding a locked DLL, then re-enable it. Invalid environments report manifest diagnostics and revert to default analysis without stale configured signatures. See the [full specification](https://github.com/MagnusOpera/FScript/blob/main/docs/specs/environment-configuration.md).
+Configured DLLs execute registration code and require workspace trust. Changes to saved manifests or provider DLLs restart only the affected server and reanalyze open buffers. On Windows, stop the server with `fscript.lsp.enabled` before rebuilding a locked DLL, then re-enable it. Invalid environments report manifest diagnostics and revert to default analysis without stale configured signatures. See the [full specification](https://github.com/FScriptLang/FScript/blob/main/docs/specs/environment-configuration.md).
 
 ## Run a script with its selected environment
 

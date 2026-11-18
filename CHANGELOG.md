@@ -4,6 +4,8 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+- Restrict marketplace publishing credentials to the release environment and keep pull-request builds credential-free.
+- Build the pinned language server from FScriptLang/FScript and update cached source origins after the repository transfer.
 - Publish to VS Code Marketplace through GitHub OIDC Trusted Publishing without a stored marketplace token.
 - Maintain extension development, client and grammar tests, VSIX packaging, and marketplace publication in FScriptLang/vscode-extension.
 

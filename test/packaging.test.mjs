@@ -6,7 +6,7 @@ import {test} from 'node:test';
 import yaml from 'js-yaml';
 import {validateRelease} from '../scripts/check-release.mjs';
 import {verifyServer} from '../scripts/verify-server.mjs';
-import {readServerConfig} from '../scripts/prepare-server.mjs';
+import {prepareServer, readServerConfig} from '../scripts/prepare-server.mjs';
 
 test('extension releases preserve the publisher and require their own tag, version, and notes', () => {
   const manifest = {name: 'fscript', publisher: 'MagnusOpera', version: '1.2.3'};
@@ -40,6 +40,50 @@ test('packaging rejects missing binaries, runtime drift, and stale source revisi
   assert.throws(() => verifyServer(directory, config), /does not match/);
 });
 
+test('cached source follows a repository transfer without changing its pin or discarding edits', (t) => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'extension-source-transfer-'));
+  t.after(() => rmSync(directory, {recursive: true, force: true}));
+  const config = readServerConfig();
+  assert.equal(config.repository, 'FScriptLang/FScript');
+  const source = path.join(directory, '.build/fscript');
+  mkdirSync(path.join(source, '.git'), {recursive: true});
+  mkdirSync(path.join(source, 'src/FScript.LanguageServer'), {recursive: true});
+  writeFileSync(path.join(directory, 'language-server.json'), JSON.stringify(config));
+  writeFileSync(path.join(source, 'WORKSPACE'), `dotnet_sdk: "${config.sdk}"`);
+  writeFileSync(path.join(source, 'src/FScript.LanguageServer/FScript.LanguageServer.csproj'), `<TargetFramework>net${config.runtime}</TargetFramework>`);
+  const calls = [];
+  let dirty = false;
+  const run = (command, args) => {
+    calls.push({command, args});
+    if (command === 'git') {
+      const operation = args.slice(2);
+      if (operation[0] === 'status') return dirty ? ' M local-edit.fs' : '';
+      if (operation[0] === 'remote' && operation[1] === 'get-url') return 'https://github.com/MagnusOpera/FScript.git';
+      if (operation[0] === 'rev-parse') return config.revision;
+      return '';
+    }
+    if (command === 'dotnet' && args[0] === 'publish') {
+      const output = args[args.indexOf('-o') + 1];
+      for (const file of ['FScript.LanguageServer.dll', 'FScript.Language.dll', 'FScript.Runtime.dll',
+        'FScript.CSharpInterop.dll', 'FScript.Extensibility.dll', 'FScript.LanguageServer.deps.json']) {
+        writeFileSync(path.join(output, file), 'fixture');
+      }
+      writeFileSync(path.join(output, 'FScript.LanguageServer.runtimeconfig.json'), JSON.stringify({runtimeOptions: {tfm: `net${config.runtime}`}}));
+    }
+    return '';
+  };
+  prepareServer({directory, run});
+  const operations = calls.filter(call => call.command === 'git').map(call => call.args.slice(2));
+  assert.deepEqual(operations.find(args => args[0] === 'remote' && args[1] === 'set-url'),
+    ['remote', 'set-url', 'origin', 'https://github.com/FScriptLang/FScript.git']);
+  assert.deepEqual(operations.find(args => args[0] === 'fetch'), ['fetch', '--depth=1', 'origin', config.revision]);
+  assert.deepEqual(JSON.parse(readFileSync(path.join(directory, 'server/source.json'), 'utf8')), config);
+  calls.length = 0;
+  dirty = true;
+  assert.throws(() => prepareServer({directory, run}), /Preserve local edits/);
+  assert.ok(!calls.some(call => call.args.includes('set-url') || call.args.includes('checkout')));
+});
+
 test('publishing waits for tested VSIX packaging and consumes only the new repository secrets', () => {
   const workflow = (name) => yaml.load(readFileSync(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8'));
   const release = workflow('release');
@@ -59,4 +103,10 @@ test('publishing waits for tested VSIX packaging and consumes only the new repos
   assert.ok(release.jobs['open-vsx'].steps.some(step => step.env?.OPEN_VSX_TOKEN === '${{ secrets.OPEN_VSX_TOKEN }}'));
   assert.doesNotMatch(JSON.stringify(release), /VSCE_TOKEN|VSCE_PAT/);
   assert.doesNotMatch(JSON.stringify(release), /PAT|repository_dispatch|MagnusOpera\/FScript/);
+  assert.deepEqual(ci.permissions, {contents: 'read'});
+  assert.equal(ci.jobs.package.environment, undefined);
+  assert.equal(ci.jobs.package.permissions, undefined);
+  assert.doesNotMatch(JSON.stringify(ci), /secrets\.|"secrets"|id-token|pull_request_target/);
+  assert.equal(ci.jobs.package.steps[0].with['persist-credentials'], false);
+  for (const job of ['github-release', 'marketplace', 'open-vsx']) assert.equal(release.jobs[job].environment, 'release');
 });

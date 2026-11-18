@@ -9,7 +9,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 
 export function readServerConfig(directory = root) {
   const config = JSON.parse(readFileSync(path.join(directory, 'language-server.json'), 'utf8'));
-  assert.equal(config.repository, 'MagnusOpera/FScript', 'Server source must come from the public FScript repository');
+  assert.equal(config.repository, 'FScriptLang/FScript', 'Server source must come from the public FScript repository');
   assert.match(config.revision, /^[a-f0-9]{40}$/, 'Pin an immutable FScript commit');
   assert.match(config.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
   assert.match(config.sdk, /^\d+\.\d+\.\d+$/);
@@ -25,8 +25,13 @@ export function prepareServer({directory = root, run = execFileSync} = {}) {
   if (!existsSync(path.join(source, '.git'))) {
     run('git', ['clone', '--filter=blob:none', `https://github.com/${config.repository}.git`, source], {stdio: 'inherit'});
   }
-  assert.equal(git('remote', 'get-url', 'origin'), `https://github.com/${config.repository}.git`);
   assert.equal(git('status', '--porcelain', '--untracked-files=no'), '', 'Preserve local edits in the server checkout before changing its revision');
+  const remote = `https://github.com/${config.repository}.git`;
+  if (git('remote', 'get-url', 'origin') !== remote) {
+    // The ignored checkout is a build cache. Follow the configured repository
+    // after transfers, but only after checking for local source edits above.
+    git('remote', 'set-url', 'origin', remote);
+  }
   git('fetch', '--depth=1', 'origin', config.revision);
   git('checkout', '--detach', config.revision);
   assert.equal(git('rev-parse', 'HEAD'), config.revision);

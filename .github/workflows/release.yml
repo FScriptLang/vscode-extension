@@ -40,6 +40,7 @@ jobs:
       release_tag: ${{ inputs.release_tag || github.ref_name }}
 
   github-release:
+    environment: release
     needs: package
     runs-on: ubuntu-latest
     permissions:
@@ -66,6 +67,7 @@ jobs:
           files: '*.vsix'
 
   marketplace:
+    environment: release
     needs: github-release
     runs-on: ubuntu-latest
     permissions:
@@ -87,6 +89,7 @@ jobs:
       - run: npm run publish:marketplace
 
   open-vsx:
+    environment: release
     needs: github-release
     runs-on: ubuntu-latest
     steps:
