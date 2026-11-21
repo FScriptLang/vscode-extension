@@ -2,7 +2,7 @@
   "name": "fscript",
   "displayName": "FScript",
   "description": "FScript, an ML-family scripting language: code completion, type checking, debugging, and tests.",
-  "version": "0.95.3",
+  "version": "0.95.4",
   "fscriptReleaseChannel": "stable",
   "publisher": "MagnusOpera",
   "icon": "assets/FScriptIcon.png",

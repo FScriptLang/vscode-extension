@@ -4,10 +4,14 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+## [0.95]
+
+### [v0.95.4]
+
 - Simplify the extension overview with an introduction to FScript, key editor features, and configuration guidance.
 - Support a Next pre-release channel with VS Code’s built-in switch between stable and pre-release versions.
 
-## [0.95]
+**Full Changelog**: https://github.com/FScriptLang/vscode-extension/compare/v0.95.3...v0.95.4
 
 ### [v0.95.3]
 
