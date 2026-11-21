@@ -25,7 +25,7 @@ exports.run = async function run() {
   fs.mkdirSync(ffiDirectory, {recursive:true});
   fs.mkdirSync(plainDirectory, {recursive:true});
   const manifest = path.join(ffiDirectory, 'fscript.toml');
-  const manifestText = `[runtime]\nextern-assemblies = ['${provider.replaceAll('\\','/')}']\n`;
+  const manifestText = `[runtime]\npermissions = ["Native"]\nextern-assemblies = ['${provider.replaceAll('\\','/')}']\n`;
   fs.writeFileSync(path.join(folder.uri.fsPath, 'provider-registration.requested'), '');
   fs.writeFileSync(manifest, manifestText);
   fs.writeFileSync(path.join(plainDirectory, 'fscript.toml'), '[runtime]\n');
@@ -98,10 +98,75 @@ exports.run = async function run() {
     await session.customRequest('continue',{threadId,singleThread:true});
     await Promise.race([ended,new Promise((_,reject) => setTimeout(() => reject(new Error('Debugger did not terminate')),10000))]);
     console.log('Real VS Code FScript debugger smoke passed.');
-    require('node:fs').writeFileSync(process.env.FSCRIPT_VSCODE_SMOKE_RESULT,'passed');
   } finally {
     clearTimeout(timeout); tracker.dispose(); termination.dispose();
     vscode.debug.removeBreakpoints([breakpoint]);
     if (vscode.debug.activeDebugSession?.type === 'fscript') await vscode.debug.stopDebugging();
   }
+
+  const testUri = vscode.Uri.joinPath(folder.uri, 'math_test.fss');
+  const mathUri = vscode.Uri.joinPath(folder.uri, 'math.fss');
+  fs.writeFileSync(mathUri.fsPath, 'export let double input =\n    input * 2\n');
+  fs.writeFileSync(testUri.fsPath, `import "math.fss" as Math
+let rows =
+    [ ("selected", 7)
+      ("other", 9) ]
+Test.each "arithmetic" rows (fun value -> Assert.equal 14 (Math.double value))
+`);
+  const editor = await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(testUri));
+  editor.selection = new vscode.Selection(2, 6, 2, 6);
+  await vscode.commands.executeCommand('testing.refreshTests');
+  const testBreakpoint = new vscode.SourceBreakpoint(new vscode.Location(mathUri, new vscode.Position(1, 4)));
+  vscode.debug.addBreakpoints([testBreakpoint]);
+  let onStop, onFailure, onResult, onTestEnd;
+  const testStop = new Promise((resolve, reject) => { onStop = resolve; onFailure = reject; });
+  const testResult = new Promise(resolve => { onResult = resolve; });
+  const testEnded = new Promise(resolve => { onTestEnd = resolve; });
+  const testTermination = vscode.debug.onDidTerminateDebugSession(session => {
+    if (session.configuration.testCase !== undefined) onTestEnd();
+  });
+  const testTracker = vscode.debug.registerDebugAdapterTrackerFactory('fscript', {
+    createDebugAdapterTracker(session) {
+      if (session.configuration.testCase === undefined) return;
+      return {
+        onDidSendMessage(message) {
+          if (message.event === 'stopped') onStop({session, threadId: message.body.threadId});
+          if (message.event === 'fscript/testResult') onResult(message.body);
+          if (message.type === 'response' && message.command === 'launch' && !message.success) onFailure(new Error(message.message));
+        }
+      };
+    }
+  });
+  const deadline = setTimeout(() => onFailure(new Error('No Test Explorer breakpoint hit')), 20000);
+  let active;
+  try {
+    void vscode.commands.executeCommand('testing.debugAtCursor').catch(onFailure);
+    const {session, threadId} = await testStop;
+    active = session;
+    assert.equal(session.configuration.testCase, 'arithmetic / selected');
+    const stack = await session.customRequest('stackTrace', {threadId});
+    assert.equal(stack.stackFrames[0].source.path, mathUri.fsPath);
+    await session.customRequest('continue', {threadId});
+    let resultDeadline;
+    try {
+      const [result] = await Promise.race([Promise.all([testResult, testEnded]), new Promise((_, reject) => {
+        resultDeadline = setTimeout(() => reject(new Error('Test Explorer did not receive the debug result')), 10000);
+      })]);
+      assert.equal(result.passed, true);
+    } finally {
+      clearTimeout(resultDeadline);
+    }
+    console.log('Real VS Code Test Explorer selected and debugged a single data row.');
+    fs.writeFileSync(process.env.FSCRIPT_VSCODE_SMOKE_RESULT, 'passed');
+  } finally {
+    clearTimeout(deadline);
+    testTracker.dispose();
+    testTermination.dispose();
+    vscode.debug.removeBreakpoints([testBreakpoint]);
+    if (active && vscode.debug.activeDebugSession === active) {
+      // A failed smoke assertion can leave a paused session behind.
+      await Promise.resolve(vscode.debug.stopDebugging(active)).catch(() => {});
+    }
+  }
+
 };

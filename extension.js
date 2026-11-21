@@ -7,6 +7,7 @@ const { selectConfiguration } = require('./config-selection');
 const { scriptLaunch } = require('./script-launch');
 const { debugLaunch } = require('./debug-launch');
 const { cliCommand } = require('./cli-command');
+const { registerTestExplorer } = require('./test-explorer');
 const clients = new Map();
 let extensionContext;
 let configurationStatus;
@@ -882,15 +883,21 @@ function registerDebugger(context) {
           if ((folder ? owner?.uri.toString() === folder.uri.toString() : document.uri.fsPath === program) && !(await document.save())) return undefined;
         }
         const entry = { folder };
-        if (folder) await refreshSelection(entry, vscode.Uri.file(program));
+        if (folder && configuration.testCase === undefined) await refreshSelection(entry, vscode.Uri.file(program));
         const cli = cliCommand(getConfig(vscode.Uri.file(program)).cliPath, folder?.uri.fsPath, program);
         const capability = await new Promise(resolve => {
           cp.execFile(cli.command, [...cli.args, '--debug-capabilities'], { timeout: 5000, encoding: 'utf8' }, (error, stdout) => {
-            try { resolve(!error && JSON.parse(stdout).protocolVersion === 1); } catch { resolve(false); }
+            try {
+              const capabilities = JSON.parse(stdout);
+              resolve(!error && capabilities.protocolVersion === 1 && (configuration.testCase === undefined || capabilities.testProtocolVersion === 1));
+            } catch { resolve(false); }
           });
         });
-        if (!capability) throw new Error('The selected FScript CLI could not report debugger support. Check fscript.cli.path, or install a CLI supporting debugging on PATH.');
-        return debugLaunch(configuration, program, folder?.uri.fsPath, entry.selection?.path);
+        if (!capability) {
+          const feature = configuration.testCase === undefined ? 'debugging' : 'test debugging';
+          throw new Error(`The selected FScript CLI does not support ${feature}. Check fscript.cli.path or install a compatible CLI on PATH.`);
+        }
+        return debugLaunch(configuration, program, folder?.uri.fsPath, configuration.testCase === undefined ? entry.selection?.path : undefined);
       } catch (error) {
         vscode.window.showErrorMessage(`FScript: ${error.message}`);
         return undefined;
@@ -911,6 +918,7 @@ function registerDebugger(context) {
 
 async function activate(context) {
   registerDebugger(context);
+  registerTestExplorer(vscode, context, (uri, folder) => cliCommand(getConfig(uri).cliPath, folder.uri.fsPath, uri.fsPath));
   extensionContext = context;
   ensureUi(context);
   registerEnvironmentUi(context);

@@ -27,6 +27,7 @@
   ],
   "activationEvents": [
     "onLanguage:fscript",
+    "workspaceContains:**/*_test.fss",
     "onDebugResolve:fscript"
   ],
   "main": "./dist/extension.js",
@@ -52,6 +53,11 @@
       }
     ],
     "commands": [
+      {
+        "command": "fscript.discoverGeneratedTests",
+        "title": "Discover Generated Tests",
+        "category": "FScript"
+      },
       {
         "command": "fscript.showLanguageServerOutput",
         "title": "Show Language Server Output",

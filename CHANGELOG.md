@@ -4,6 +4,9 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+- List, run, and debug FScript tests in Test Explorer, including named data rows.
+- Show test timings alongside console output with the Run with Profiling profile.
+
 ## [0.95]
 
 ### [v0.95.2]

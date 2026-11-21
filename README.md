@@ -199,6 +199,16 @@ parentheses, and literals without executing functions. Native FScript callbacks
 can be debugged, but their native caller waits while paused. Fable debugging and
 attach are unavailable. Restart to pick up source or provider changes.
 
+## Test Explorer
+
+Open a workspace containing `*_test.fss` files. The Testing view lists files, literal `Test.case` names, and named `Test.each` rows. Use **Run** or **Debug** from the tree or editor gutter. Assertion failures link back to the assertion's source. A debug launch can stop inside imported code.
+
+Discovery parses files without running setup. In a trusted workspace, use **FScript: Discover Generated Tests** to initialize test files and list cases registered at runtime. Runs and debug sessions use the workspace folder's `fscript.toml` and require workspace trust.
+
+Choose **Run with Profiling** from the Testing view's run profile menu. Test Results shows console output, file setup time, and the slowest selected cases. Each file or case sent to the CLI produces its own timing report.
+
+This feature requires an FScript CLI with Test Explorer support. For development, point `fscript.cli.path` to a current checkout build.
+
 ### Testing a local CLI build
 
 Build the CLI with `make build`, then set `fscript.cli.path` in user or

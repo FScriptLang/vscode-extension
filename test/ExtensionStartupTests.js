@@ -120,6 +120,7 @@ function loadExtension({ initialize = async () => {}, enabled = true, folders, c
     require(id) {
       if (id === './language-server.json') return require(path.join(extensionPath, 'language-server.json'));
       if (id === './cli-command') return require(path.join(extensionPath, 'cli-command.js'));
+      if (id === './test-explorer') return require(path.join(extensionPath, 'test-explorer.js'));
       if (id === './debug-launch') return require(path.join(extensionPath, 'debug-launch.js'));
       if (id === './script-launch') return require(path.join(extensionPath, 'script-launch.js'));
       if (id === './config-selection') return require(path.join(extensionPath, 'config-selection.js'));
