@@ -4,6 +4,11 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+## [0.95]
+
+### [v0.95.0]
+
+- Bundle the FScript 0.95.0 language server with Extensibility SDK 3.
 - Highlight `typeof` and `nameof` as FScript keywords in VS Code.
 - Restrict marketplace publishing credentials to the release environment and keep pull-request builds credential-free.
 - Build the pinned language server from FScriptLang/FScript and update cached source origins after the repository transfer.

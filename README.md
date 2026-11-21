@@ -34,7 +34,7 @@ npm ci
 npm test
 npm run prepare:server
 npm run package
-node scripts/verify-vsix.mjs fscript-0.94.3.vsix
+node scripts/verify-vsix.mjs "fscript-$(node -p 'require("./package.json").version').vsix"
 ```
 
 `prepare:server` fetches a public FScript checkout into ignored `.build/fscript`,
@@ -72,7 +72,8 @@ artifacts. Extension releases are independent of language releases.
    `release`. The marketplace job requests `id-token: write` and runs `vsce publish --oidc`;
    no Marketplace token or Azure login is used.
 2. Update `language-server.json` when adopting a new language release: pin its
-   exact commit, numeric package version, SDK, and runtime together. Keep the
+   exact commit, numeric package version, .NET SDK and runtime, and
+   Extensibility assembly version together. Keep the
    packaged Runtime/Language assembly versions aligned with that release's
    NuGet packages. The extension version may advance independently.
 3. Choose a new extension version with `npm version X.Y.Z --no-git-tag-version`.

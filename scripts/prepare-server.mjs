@@ -14,6 +14,7 @@ export function readServerConfig(directory = root) {
   assert.match(config.version, /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
   assert.match(config.sdk, /^\d+\.\d+\.\d+$/);
   assert.match(config.runtime, /^\d+\.\d+$/);
+  assert.match(config.extensibilityAssemblyVersion, /^\d+\.\d+\.\d+\.\d+$/);
   return config;
 }
 
@@ -44,10 +45,11 @@ export function prepareServer({directory = root, run = execFileSync} = {}) {
   try {
     run('dotnet', ['publish', path.join(source, 'src/FScript.LanguageServer/FScript.LanguageServer.csproj'),
       '-c', 'Release', '-p:PublishAot=false', `-p:Version=${config.version}`, '-o', staged], {cwd: source, stdio: 'inherit'});
-    // This upstream regression checks assembly versions and real configured
-    // SDK providers against the exact binaries that will enter the VSIX.
+    run('dotnet', ['run', '--file', path.join(directory, 'scripts/verify-assembly-versions.cs'), '--',
+      staged, config.version, config.extensibilityAssemblyVersion], {cwd: source, stdio: 'inherit'});
+    // Test real SDK providers against the exact binaries that will enter the VSIX.
     run('dotnet', ['test', path.join(source, 'tests/FScript.LanguageServer.Tests/FScript.LanguageServer.Tests.csproj'),
-      '-c', 'Release', '--filter', 'FullyQualifiedName~ReleasePackagingTests|FullyQualifiedName~EnvironmentTests'], {
+      '-c', 'Release', '--filter', 'FullyQualifiedName~EnvironmentTests'], {
       cwd: source, stdio: 'inherit', env: {...process.env, FSCRIPT_RELEASE_SERVER_DIR: staged, FSCRIPT_RELEASE_VERSION: config.version},
     });
     writeFileSync(path.join(staged, 'source.json'), `${JSON.stringify(config, null, 2)}\n`);

@@ -78,6 +78,9 @@ test('cached source follows a repository transfer without changing its pin or di
     ['remote', 'set-url', 'origin', 'https://github.com/FScriptLang/FScript.git']);
   assert.deepEqual(operations.find(args => args[0] === 'fetch'), ['fetch', '--depth=1', 'origin', config.revision]);
   assert.deepEqual(JSON.parse(readFileSync(path.join(directory, 'server/source.json'), 'utf8')), config);
+  const verification = calls.find(({command, args}) => command === 'dotnet' && args[0] === 'run');
+  assert.equal(path.basename(verification.args[2]), 'verify-assembly-versions.cs');
+  assert.deepEqual(verification.args.slice(-2), [config.version, config.extensibilityAssemblyVersion]);
   calls.length = 0;
   dirty = true;
   assert.throws(() => prepareServer({directory, run}), /Preserve local edits/);
