@@ -100,7 +100,13 @@ test('publishing waits for tested VSIX packaging and consumes only the new repos
   assert.ok(steps.findIndex(step => step.run === 'npm run prepare:server') < steps.findIndex(step => step.run === 'npm run package'));
   assert.ok(steps.some(step => step.run?.includes('verify-vsix.mjs')));
   assert.equal(release.jobs['github-release'].needs, 'package');
-  assert.equal(release.jobs.marketplace.needs, 'github-release');
+  assert.deepEqual(release.jobs.marketplace.needs, ['validate', 'github-release']);
+  assert.ok(release.jobs.package.if.includes('!inputs.marketplace_only'));
+  assert.ok(release.jobs.marketplace.if.includes("needs.validate.result == 'success'"));
+  assert.ok(release.jobs.marketplace.if.includes("inputs.marketplace_only && needs.github-release.result == 'skipped'"));
+  assert.equal(release.jobs.marketplace.steps[0].with.ref, undefined, 'Publisher uses the workflow revision');
+  const downloadPublished = release.jobs.marketplace.steps.find(step => step.run?.startsWith('gh release download'));
+  assert.equal(downloadPublished.if, 'inputs.marketplace_only');
   assert.equal(release.jobs.marketplace.permissions['id-token'], 'write');
   assert.equal(release.jobs['open-vsx'].needs, 'github-release');
   assert.ok(release.jobs['open-vsx'].steps.some(step => step.env?.OPEN_VSX_TOKEN === '${{ secrets.OPEN_VSX_TOKEN }}'));

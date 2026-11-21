@@ -86,7 +86,9 @@ release, then publishes that artifact to VS Code Marketplace and Open VSX.
 Main pushes and pull requests only test and produce an installable VSIX artifact.
 No marketplace publication happens on main. The manual **Publish Extension**
 workflow accepts an existing extension tag for retries, checking out that exact
-tag even when dispatched from main. Already-published marketplace versions are
+tag even when dispatched from main. For a Marketplace-only retry, select
+`marketplace_only` to publish the existing GitHub release VSIX using the
+publishing tool from the workflow revision. Already-published marketplace versions are
 accepted on retries. Only the extension's restricted `release` environment holds
 `OPEN_VSX_TOKEN`. Do not duplicate it as a repository or organization secret,
 which a modified same-repository PR could read without entering an environment.

@@ -4,6 +4,8 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+- Use the current Marketplace token exchange and retry Marketplace publishing with the released VSIX.
+
 ## [0.95]
 
 ### [v0.95.0]
