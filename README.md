@@ -161,11 +161,11 @@ Configured DLLs execute registration code and require workspace trust. Changes t
 
 ### NuGet extension packages
 
-Manifests can also use `[[runtime.packages]]` with required `name` and optional exact `version` (omitted means latest stable). Packages use the existing SDK `[FScriptExternProvider]` registration method; no assembly path or additional attribute is needed. Trusted folder environments restore transitive runtime dependencies through NuGet, without an installed .NET SDK. Restricted Mode performs no restore or provider execution. Packages restore automatically into `.fscript` beside the manifest; this cache is excluded from configuration discovery. Add `.fscript/` to `.gitignore`. Resolved versions appear in the configuration tooltip. Restart the environment to refresh an unpinned package; pin versions for repeatable execution.
+Manifests can also use `[[runtime.packages]]` with required `name` and optional exact `version` (omitted means latest stable). Packages use the existing SDK `[FScriptExternProvider]` registration method; no assembly path or additional attribute is needed. Trusted folder environments restore transitive runtime dependencies through NuGet, without an installed .NET SDK. Restricted Mode performs no restore or provider execution. Packages restore automatically into `.fscript` beside the manifest; this cache is excluded from configuration discovery. Add `.fscript/` to `.gitignore`. Resolved versions appear in the configuration tooltip. Restart the environment to refresh an unpinned package; pin versions for repeatable execution. Replace the example package ID and version with a provider built against Extensibility SDK 3.
 
 ```toml
 [[runtime.packages]]
-name = "FScript.Numerics.Extensions"
+name = "Contoso.FScript.Extensions"
 version = "0.1.0"
 ```
 

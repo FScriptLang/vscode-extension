@@ -4,9 +4,12 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
-- Use the current Marketplace token exchange and retry Marketplace publishing with the released VSIX.
-
 ## [0.95]
+
+### [v0.95.1]
+
+- Bundle FScript 0.95.1 with responsive debugging and breakpoints inside generic JSON decoders.
+- Use the current Marketplace token exchange and retry Marketplace publishing with the released VSIX.
 
 ### [v0.95.0]
 
