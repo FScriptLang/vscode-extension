@@ -4,6 +4,7 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+- Highlight `typeof` and `nameof` as FScript keywords in VS Code.
 - Restrict marketplace publishing credentials to the release environment and keep pull-request builds credential-free.
 - Build the pinned language server from FScriptLang/FScript and update cached source origins after the repository transfer.
 - Publish to VS Code Marketplace through GitHub OIDC Trusted Publishing without a stored marketplace token.

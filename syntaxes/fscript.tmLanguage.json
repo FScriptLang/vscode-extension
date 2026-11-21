@@ -65,6 +65,10 @@
           "match": "\\b(let|rec|and|if|then|elif|else|match|with|when|for|in|do|fun|raise|type|module)\\b"
         },
         {
+          "name": "keyword.control.fscript",
+          "match": "(?<![\\p{L}\\p{Nd}_'])(?:typeof|nameof)(?![\\p{L}\\p{Nd}_'])"
+        },
+        {
           "name": "constant.language.fscript",
           "match": "\\b(true|false|None|Some)\\b"
         }

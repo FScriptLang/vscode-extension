@@ -9,6 +9,17 @@ const prefix = declarations.find(pattern => pattern.name === "keyword.control.fs
 const binding = declarations.find(pattern => pattern.name === "meta.let.binding.fscript");
 const typePatterns = grammar.repository.types.patterns;
 
+test("TextMate highlights typeof and nameof as keywords", () => {
+  const keywordPatterns = grammar.repository.keywords.patterns
+    .filter(pattern => pattern.name === prefix.name);
+  const keywords = new RegExp(keywordPatterns.map(pattern => pattern.match).join("|"), "gu");
+  const source = "export let text = nameof value\nlet kind = typeof int";
+
+  assert.ok(grammar.patterns.some(pattern => pattern.include === "#keywords"));
+  assert.deepEqual(source.match(keywords), ["let", "nameof", "let", "typeof"]);
+  assert.equal("typeofValue nameof_value mytypeof typeof' nameof' énameof typeofé".match(keywords), null);
+});
+
 test('TextMate highlights numeric annotations without matching identifier substrings', () => {
   const expression = typePatterns.find(pattern => pattern.name === 'storage.type.fscript').match;
   assert.deepEqual('let add (x: numeric) (y: numeric) : numeric = x + y'.match(new RegExp(expression, 'g')),
