@@ -3,7 +3,7 @@
 - This repository owns the `MagnusOpera.fscript` VS Code extension. Preserve
   its marketplace identity and Magnus Opera branding.
 - Run `npm test`, `npm run prepare:server`, `npm run package`, and the VSIX
-  inspection command documented in README before submitting changes.
+  inspection command documented in CONTRIBUTING.md before submitting changes.
 - Add regression tests for client, grammar, packaging, and publishing changes.
 - Keep server source pinned to an immutable public FScript commit in
   `language-server.json`.

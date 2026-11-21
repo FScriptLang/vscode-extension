@@ -12,6 +12,7 @@ extension.js
 scripts/**
 test/**
 AGENTS.md
+CONTRIBUTING.md
 Makefile
 package-lock.json
 .nvmrc

@@ -64,7 +64,7 @@ For example, after Stable `0.95.3`, Next could use `0.96.0`. Before promoting
 reserved releases. Do not impose odd/even minor parity on existing history.
 
 Validate each selected source/channel with `npm test`, `npm run prepare:server`,
-`npm run package`, and the README's `verify-vsix.mjs` command before tagging.
+`npm run package`, and the `verify-vsix.mjs` command in [Contributing](../CONTRIBUTING.md) before tagging.
 After publication, verify the pre-release listing and switch in VS Code, the
 GitHub release classification, and the Open VSX pre-release entry.
 

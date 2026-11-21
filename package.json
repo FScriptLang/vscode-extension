@@ -1,7 +1,7 @@
 {
   "name": "fscript",
   "displayName": "FScript",
-  "description": "Syntax highlighting and language-server integration for FScript (*.fss).",
+  "description": "FScript, an ML-family scripting language: code completion, type checking, debugging, and tests.",
   "version": "0.95.3",
   "fscriptReleaseChannel": "stable",
   "publisher": "MagnusOpera",
