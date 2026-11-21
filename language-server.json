@@ -1,7 +1,7 @@
 {
   "repository": "FScriptLang/FScript",
-  "revision": "9f221f363dbaa744643b428020d9da7ff5cfaa61",
-  "version": "0.95.2",
+  "revision": "18a081cd6adf60bc5fa787914885173d032f09f2",
+  "version": "0.95.3",
   "sdk": "11.0.100",
   "runtime": "11.0",
   "extensibilityAssemblyVersion": "3.0.0.0"

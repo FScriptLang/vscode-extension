@@ -4,10 +4,13 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+## [0.95]
+
+### [v0.95.3]
+
 - List, run, and debug FScript tests in Test Explorer, including named data rows.
 - Show test timings alongside console output with the Run with Profiling profile.
-
-## [0.95]
+- Bundle the FScript 0.95.3 language server with Extensibility SDK 3.0.0.
 
 ### [v0.95.2]
 

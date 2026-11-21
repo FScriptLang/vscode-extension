@@ -2,7 +2,7 @@
   "name": "fscript",
   "displayName": "FScript",
   "description": "Syntax highlighting and language-server integration for FScript (*.fss).",
-  "version": "0.95.2",
+  "version": "0.95.3",
   "publisher": "MagnusOpera",
   "icon": "assets/FScriptIcon.png",
   "license": "MIT",
