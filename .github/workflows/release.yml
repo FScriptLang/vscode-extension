@@ -66,11 +66,16 @@ jobs:
         env:
           RELEASE_TAG: ${{ inputs.release_tag || github.ref_name }}
         run: node scripts/check-release.mjs > release-notes.md
+      - name: Read packaged release channel
+        id: channel
+        run: echo "channel=$(node scripts/release-channel.mjs fscript-$(node -p 'require("./package.json").version').vsix)" >> "$GITHUB_OUTPUT"
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.release_tag || github.ref_name }}
           body_path: release-notes.md
           files: '*.vsix'
+          prerelease: ${{ steps.channel.outputs.channel == 'next' }}
+          make_latest: ${{ steps.channel.outputs.channel != 'next' }}
 
   marketplace:
     environment: release

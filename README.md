@@ -25,6 +25,17 @@ Each `add` call accepts either two integers or two floats. Mixed numeric types a
 
 See the [type-system guide](https://github.com/FScriptLang/FScriptLang.github.io/blob/main/docs/next/language/type-system.md) for the type hierarchy.
 
+## Stable and Next
+
+Once a Next pre-release is published, open FScript in VS Code's Extensions view
+and choose **Switch to Pre-Release Version** to use its bundled Next language
+server. Choose **Switch to Release Version** to return to Stable. Both channels
+use `MagnusOpera.fscript`; VS Code manages updates for the selected channel.
+A custom `fscript.server.path` continues to override the bundled server.
+
+See [release channels](docs/release-channels.md) for the publishing contract,
+version ordering, and the separate CLI installation.
+
 ## Development
 
 From this repository:
@@ -76,13 +87,17 @@ artifacts. Extension releases are independent of language releases.
    Extensibility assembly version together. Keep the
    packaged Runtime/Language assembly versions aligned with that release's
    NuGet packages. The extension version may advance independently.
-3. Choose a new extension version with `npm version X.Y.Z --no-git-tag-version`.
+3. Set `fscriptReleaseChannel` in `package.json` to `stable` or `next` and choose
+   a distinct numeric extension version with `npm version X.Y.Z --no-git-tag-version`.
+   Follow the [channel version ordering rules](docs/release-channels.md).
 4. Document it under `### [vX.Y.Z]` in `CHANGELOG.md`, retaining Unreleased above.
 5. Commit, tag `vX.Y.Z`, and push the commit and tag. CI requires the tag to
    match the committed package version and release notes.
 
 The tag workflow validates, tests, builds and inspects one VSIX, creates a GitHub
 release, then publishes that artifact to VS Code Marketplace and Open VSX.
+Next packages carry pre-release metadata in both registries; their GitHub
+releases are marked pre-release and do not replace the latest stable release.
 Main pushes and pull requests only test and produce an installable VSIX artifact.
 No marketplace publication happens on main. The manual **Publish Extension**
 workflow accepts an existing extension tag for retries, checking out that exact

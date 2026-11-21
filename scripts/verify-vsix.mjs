@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
+import {releaseChannel, vsixChannel} from './release-channel.mjs';
 
 const packageFile = process.argv[2];
 assert.ok(packageFile, 'Supply the VSIX path');
@@ -16,4 +17,5 @@ const packaged = JSON.parse(execFileSync('unzip', ['-p', packageFile, 'extension
 assert.equal(packaged.publisher, 'MagnusOpera');
 assert.equal(packaged.name, 'fscript');
 assert.equal(packaged.version, expected.version);
+assert.equal(vsixChannel(packageFile), releaseChannel(expected));
 console.log(`Verified ${packageFile}: MagnusOpera.fscript ${packaged.version} with bundled language server.`);

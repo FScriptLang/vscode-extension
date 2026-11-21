@@ -4,6 +4,8 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+- Support a Next pre-release channel with VS Code’s built-in switch between stable and pre-release versions.
+
 ## [0.95]
 
 ### [v0.95.3]

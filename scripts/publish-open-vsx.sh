@@ -20,6 +20,11 @@ if [[ "${#vsix_files[@]}" -gt 1 ]]; then
 fi
 
 vsix_file="${vsix_files[0]#./}"
+channel="$(node "$(dirname "$0")/release-channel.mjs" "$vsix_file")"
+channel_args=()
+if [[ "$channel" == next ]]; then
+  channel_args+=(--pre-release)
+fi
 echo "Publishing VSIX to Open VSX: ${vsix_file}"
 
 is_duplicate_publish_error() {
@@ -29,7 +34,7 @@ is_duplicate_publish_error() {
 
 echo "Open VSX publish attempt 1/1"
 set +e
-output="$(ovsx publish "$vsix_file" --pat "$OPEN_VSX_TOKEN" 2>&1)"
+output="$(ovsx publish "$vsix_file" --pat "$OPEN_VSX_TOKEN" "${channel_args[@]}" 2>&1)"
 status=$?
 set -e
 

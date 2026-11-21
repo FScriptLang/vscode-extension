@@ -9,4 +9,9 @@ fi
 
 vsix_file="${vsix_files[0]#./}"
 echo "Publishing VSIX to VS Code Marketplace with Trusted Publishing: ${vsix_file}"
-vsce publish --packagePath "$vsix_file" --oidc --skip-duplicate
+channel="$(node "$(dirname "$0")/release-channel.mjs" "$vsix_file")"
+channel_args=()
+if [[ "$channel" == next ]]; then
+  channel_args+=(--pre-release)
+fi
+vsce publish --packagePath "$vsix_file" --oidc --skip-duplicate "${channel_args[@]}"

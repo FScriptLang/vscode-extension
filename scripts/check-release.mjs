@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import {releaseChannel} from './release-channel.mjs';
 
 export function validateRelease(tag, manifest, changelog) {
   assert.equal(/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(tag)?.[0], tag,
     'Use a canonical vX.Y.Z extension tag');
+  releaseChannel(manifest);
   assert.equal(tag, `v${manifest.version}`, 'Tag must match the committed extension version');
   assert.equal(manifest.publisher, 'MagnusOpera');
   assert.equal(manifest.name, 'fscript');
