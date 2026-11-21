@@ -6,6 +6,10 @@ All notable changes to FScript are documented in this file.
 
 ## [0.95]
 
+### [v0.95.2]
+
+- Keep `typeof` and `nameof` highlighted as keywords when the bundled language server is active.
+
 ### [v0.95.1]
 
 - Bundle FScript 0.95.1 with responsive debugging and breakpoints inside generic JSON decoders.
