@@ -4,10 +4,14 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+## [0.95]
+
+### [v0.95.5]
+
 - Download supported language servers from FScript releases and offer upgrades without reinstalling the extension.
 - Keep cached servers available offline and support version pinning and rollback.
 
-## [0.95]
+**Full Changelog**: https://github.com/FScriptLang/vscode-extension/compare/v0.95.4...v0.95.5
 
 ### [v0.95.4]
 
