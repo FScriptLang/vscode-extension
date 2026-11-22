@@ -1,12 +1,10 @@
 import assert from 'node:assert/strict';
-import {mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync} from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
+import {readFileSync} from 'node:fs';
 import {test} from 'node:test';
 import yaml from 'js-yaml';
 import {validateRelease} from '../scripts/check-release.mjs';
-import {verifyServer} from '../scripts/verify-server.mjs';
-import {prepareServer, readServerConfig} from '../scripts/prepare-server.mjs';
+import {readServerConfig} from '../scripts/verify-server.mjs';
+import {prepareServer} from '../scripts/prepare-server.mjs';
 
 test('extension releases preserve the publisher and require their own tag, version, and notes', () => {
   const manifest = {name: 'fscript', publisher: 'MagnusOpera', version: '1.2.3'};
@@ -19,72 +17,15 @@ test('extension releases preserve the publisher and require their own tag, versi
   assert.throws(() => validateRelease('v1.2.3', manifest, '# Changelog'));
 });
 
-test('packaging rejects missing binaries, runtime drift, and stale source revisions', (t) => {
-  const directory = mkdtempSync(path.join(os.tmpdir(), 'extension-server-'));
-  t.after(() => rmSync(directory, {recursive: true, force: true}));
-  const config = readServerConfig();
-  assert.throws(() => verifyServer(directory, config), /Missing packaged server file/);
-  for (const file of ['FScript.LanguageServer.dll', 'FScript.Language.dll', 'FScript.Runtime.dll',
-    'FScript.CSharpInterop.dll', 'FScript.Extensibility.dll', 'FScript.LanguageServer.deps.json']) {
-    writeFileSync(path.join(directory, file), 'fixture');
-  }
-  const runtime = (value) => writeFileSync(path.join(directory, 'FScript.LanguageServer.runtimeconfig.json'),
-    JSON.stringify({runtimeOptions: {tfm: value}}));
-  writeFileSync(path.join(directory, 'source.json'), JSON.stringify(config));
-  runtime(`net${config.runtime}`);
-  verifyServer(directory, config);
-  runtime('net0.0');
-  assert.throws(() => verifyServer(directory, config));
-  runtime(`net${config.runtime}`);
-  writeFileSync(path.join(directory, 'source.json'), JSON.stringify({...config, revision: '0'.repeat(40)}));
-  assert.throws(() => verifyServer(directory, config), /does not match/);
-});
-
-test('cached source follows a repository transfer without changing its pin or discarding edits', (t) => {
-  const directory = mkdtempSync(path.join(os.tmpdir(), 'extension-source-transfer-'));
-  t.after(() => rmSync(directory, {recursive: true, force: true}));
+test('packaging validates acquisition without a server checkout, binaries, or network access', async () => {
   const config = readServerConfig();
   assert.equal(config.repository, 'FScriptLang/FScript');
-  const source = path.join(directory, '.build/fscript');
-  mkdirSync(path.join(source, '.git'), {recursive: true});
-  mkdirSync(path.join(source, 'src/FScript.LanguageServer'), {recursive: true});
-  writeFileSync(path.join(directory, 'language-server.json'), JSON.stringify(config));
-  writeFileSync(path.join(source, 'WORKSPACE'), `dotnet_sdk: "${config.sdk}"`);
-  writeFileSync(path.join(source, 'src/FScript.LanguageServer/FScript.LanguageServer.csproj'), `<TargetFramework>net${config.runtime}</TargetFramework>`);
-  const calls = [];
-  let dirty = false;
-  const run = (command, args) => {
-    calls.push({command, args});
-    if (command === 'git') {
-      const operation = args.slice(2);
-      if (operation[0] === 'status') return dirty ? ' M local-edit.fs' : '';
-      if (operation[0] === 'remote' && operation[1] === 'get-url') return 'https://github.com/MagnusOpera/FScript.git';
-      if (operation[0] === 'rev-parse') return config.revision;
-      return '';
-    }
-    if (command === 'dotnet' && args[0] === 'publish') {
-      const output = args[args.indexOf('-o') + 1];
-      for (const file of ['FScript.LanguageServer.dll', 'FScript.Language.dll', 'FScript.Runtime.dll',
-        'FScript.CSharpInterop.dll', 'FScript.Extensibility.dll', 'FScript.LanguageServer.deps.json']) {
-        writeFileSync(path.join(output, file), 'fixture');
-      }
-      writeFileSync(path.join(output, 'FScript.LanguageServer.runtimeconfig.json'), JSON.stringify({runtimeOptions: {tfm: `net${config.runtime}`}}));
-    }
-    return '';
-  };
-  prepareServer({directory, run});
-  const operations = calls.filter(call => call.command === 'git').map(call => call.args.slice(2));
-  assert.deepEqual(operations.find(args => args[0] === 'remote' && args[1] === 'set-url'),
-    ['remote', 'set-url', 'origin', 'https://github.com/FScriptLang/FScript.git']);
-  assert.deepEqual(operations.find(args => args[0] === 'fetch'), ['fetch', '--depth=1', 'origin', config.revision]);
-  assert.deepEqual(JSON.parse(readFileSync(path.join(directory, 'server/source.json'), 'utf8')), config);
-  const verification = calls.find(({command, args}) => command === 'dotnet' && args[0] === 'run');
-  assert.equal(path.basename(verification.args[2]), 'verify-assembly-versions.cs');
-  assert.deepEqual(verification.args.slice(-2), [config.version, config.extensibilityAssemblyVersion]);
-  calls.length = 0;
-  dirty = true;
-  assert.throws(() => prepareServer({directory, run}), /Preserve local edits/);
-  assert.ok(!calls.some(call => call.args.includes('set-url') || call.args.includes('checkout')));
+  assert.equal(config.supportedVersions, '>=0.95.5 <0.96.0');
+  assert.deepEqual(await prepareServer(), config);
+  const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.equal(manifest.contributes.configuration.properties['fscript.server.version'].scope, 'machine');
+  const ignored = readFileSync(new URL('../.vscodeignore', import.meta.url), 'utf8');
+  assert.match(ignored, /server\/\*\*/);
 });
 
 test('publishing waits for tested VSIX packaging and consumes only the new repository secrets', () => {

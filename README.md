@@ -26,7 +26,8 @@ let values = [1; 2; 3] |> List.map double
 ## Get started
 
 Install the extension in VS Code 1.91 or later and open a `.fss` file. The language
-server is bundled, and the required .NET runtime is acquired automatically.
+server is downloaded from FScript GitHub Releases on first use, and its required
+.NET runtime is acquired automatically. Cached installations work offline.
 
 To run, debug, or test scripts, also install the
 [FScript CLI](https://fscript.magnusopera.io/manual/learn/editor-setup) and make
@@ -50,7 +51,8 @@ Settings to customize it:
 | `fscript.cli.path` | CLI executable or `fscript.dll`; empty uses `fscript` on PATH. |
 | `fscript.repl.command` | REPL launch command; default `auto` detects a local CLI or uses PATH. |
 | `fscript.config` | Workspace-relative `fscript.toml` path; overrides the configuration picker. |
-| `fscript.server.path` | Optional custom language server; empty uses the bundled server. |
+| `fscript.server.path` | Optional custom language server; empty acquires a supported released server. |
+| `fscript.server.version` | Pin an exact supported server version; empty offers upgrades. |
 | `fscript.lsp.enabled` | Enable editor language services (default: `true`). |
 | `fscript.server.logLevel` | Server logging level (default: `info`). |
 
@@ -65,11 +67,18 @@ and [environment configuration guide](https://fscript.magnusopera.io/manual/refe
 for examples and advanced options. For startup problems, run
 **FScript: Show Language Server Output**.
 
+On startup the extension checks for newer language servers in the background.
+Accept **Update Language Server** to install one, then reload when convenient.
+If the latest server needs a newer extension, it offers **Update Extension**.
+Use **FScript: Check for Language Server Updates** to check manually. Previous
+servers stay cached: set `fscript.server.version` to a supported older version
+to roll back. Updates never change your CLI installation.
+
 ## Stable and Next
 
 Stable is the default. When a Next pre-release is available, choose **Switch to
-Pre-Release Version** on the extension's details page to try its bundled Next
-language server. Choose **Switch to Release Version** to return to Stable.
+Pre-Release Version** on the extension's details page to try the Next extension. Both channels acquire released
+language servers within their declared compatibility ranges. Choose **Switch to Release Version** to return to Stable.
 The CLI is installed separately; use a compatible version when running Next code.
 
 [Report an issue](https://github.com/FScriptLang/vscode-extension/issues) ·

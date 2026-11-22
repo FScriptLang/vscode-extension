@@ -17,3 +17,12 @@ Makefile
 package-lock.json
 .nvmrc
 .gitignore
+
+server/**
+server-manager.js
+server-updates.js
+cli-command.js
+config-selection.js
+debug-launch.js
+script-launch.js
+test-explorer.js

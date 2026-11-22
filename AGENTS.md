@@ -5,10 +5,11 @@
 - Run `npm test`, `npm run prepare:server`, `npm run package`, and the VSIX
   inspection command documented in CONTRIBUTING.md before submitting changes.
 - Add regression tests for client, grammar, packaging, and publishing changes.
-- Keep server source pinned to an immutable public FScript commit in
-  `language-server.json`.
+- Declare the supported released server version range and runtime in
+  `language-server.json`; acquire verified GitHub Release assets at runtime.
 - Keep Language/Runtime assembly versions aligned with the selected language
   release. Never relabel newer server source with an older release version.
+- Do not bundle server binaries or build FScript source while packaging a VSIX.
 - Keep language-server, language, runtime, and CLI/DAP implementations in
   FScriptLang/FScript. Do not maintain duplicate implementations here.
 - Keep Unreleased at the top of CHANGELOG. New extension releases require a
@@ -31,11 +32,10 @@
   debug adapter, or language server also needs a change.
 - Before pushing, fetch and verify the intended commits in both repositories.
   Open a PR only when asked. Extension-only releases can advance independently.
-- For a coordinated release, let the FScript release pass and pin its exact
-  public commit in `language-server.json`. Keep the product version, .NET SDK,
-  .NET runtime and Extensibility assembly identity consistent with that source.
-  Complete the local test, server, packaging, and VSIX inspection checks before
-  pushing the extension tag. Inspect the actual bundled assembly identities.
+- For a coordinated release, publish FScript's server assets first, then update
+  the supported range/runtime in `language-server.json` as necessary. Complete
+  local tests, acquisition configuration, packaging, VSIX inspection, and a real
+  editor smoke test against the intended server before pushing an extension tag.
 - Confirm the tag workflow publishes the VSIX to GitHub, VS Code Marketplace,
   and Open VSX. Keep pushed tags immutable. For a Marketplace-only failure,
   retry the existing GitHub release VSIX with `marketplace_only` from the

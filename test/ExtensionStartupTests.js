@@ -6,7 +6,7 @@ const { test } = require('node:test');
 
 const extensionPath = path.resolve(__dirname, '..');
 
-function loadExtension({ initialize = async () => {}, enabled = true, folders, candidates = [], trusted = true, settings = {}, development = false, debugCli = false, cliPaths = {}, documents = [], environmentInfo, buildDotnet = async () => {} } = {}) {
+function loadExtension({ initialize = async () => {}, enabled = true, folders, candidates = [], trusted = true, settings = {}, development = false, debugCli = false, cliPaths = {}, documents = [], environmentInfo, acquireServer = async () => {}, serverPath = '' } = {}) {
   const disposable = () => ({ dispose() {} });
   const errors = [];
   const clients = [];
@@ -23,6 +23,7 @@ function loadExtension({ initialize = async () => {}, enabled = true, folders, c
   const searches = [];
   const processCalls = [];
   const processCommands = [];
+  const serverCalls = [];
   const debugProviders = [];
   const debugFactories = [];
   const debugLaunches = [];
@@ -66,7 +67,7 @@ function loadExtension({ initialize = async () => {}, enabled = true, folders, c
       showWarningMessage: message => errors.push(message)
     },
     workspace: {
-      getConfiguration: (section, resource) => ({ get: (key, fallback) => key === 'cli.path' ? cliPaths[resource?.fsPath] || '' : key === 'lsp.enabled' ? enabled : (section === 'fscript' && key === 'config' ? settings[resource?.fsPath] || '' : fallback) }),
+      getConfiguration: (section, resource) => ({ get: (key, fallback) => key === 'server.path' ? serverPath : key === 'cli.path' ? cliPaths[resource?.fsPath] || '' : key === 'lsp.enabled' ? enabled : (section === 'fscript' && key === 'config' ? settings[resource?.fsPath] || '' : fallback) }),
       workspaceFolders: rootFolders,
       getWorkspaceFolder: workspaceFolder,
       isTrusted: trusted,
@@ -118,6 +119,11 @@ function loadExtension({ initialize = async () => {}, enabled = true, folders, c
   const sandbox = {
     module: { exports: {} },
     require(id) {
+      if (id === './server-updates') return { createServerController() {
+        let pending;
+        return { resolve: () => pending ||= (async () => { serverCalls.push('resolve'); await acquireServer(); return {dll: '/cache/language-servers/0.95.5/FScript.LanguageServer.dll', version: '0.95.5'}; })(),
+          dispose() {}, async check() { serverCalls.push('check'); } };
+      } };
       if (id === './language-server.json') return require(path.join(extensionPath, 'language-server.json'));
       if (id === './cli-command') return require(path.join(extensionPath, 'cli-command.js'));
       if (id === './test-explorer') return require(path.join(extensionPath, 'test-explorer.js'));
@@ -132,7 +138,7 @@ function loadExtension({ initialize = async () => {}, enabled = true, folders, c
           processCalls.push(args);
           processCommands.push(command);
           if (args.at(-1) === '--debug-capabilities') { callback(null, '{"protocolVersion":1}'); return; }
-          (args[0] === '--list-sdks' ? Promise.resolve() : buildDotnet()).then(() => callback(null, '10.0.401', ''));
+          Promise.resolve().then(() => callback(null, '10.0.401', ''));
         }
       };
       return require(id);
@@ -149,7 +155,7 @@ function loadExtension({ initialize = async () => {}, enabled = true, folders, c
   };
   return {
     extension: sandbox.module.exports, context, errors, clients, channels, status,
-    watchers, vscode, selections, commands, information, searches, processCalls, processCommands, debugProviders, debugFactories, debugLaunches,
+    watchers, vscode, selections, commands, information, searches, processCalls, processCommands, serverCalls, debugProviders, debugFactories, debugLaunches,
     replLaunch: () => sandbox.resolveReplLaunchCommand(),
     pick: label => { choice = label; },
     grantTrust: () => { vscode.workspace.isTrusted = true; grantTrust(); },
@@ -181,7 +187,7 @@ test('activation uses a logging channel and registers only disposables', async (
   assert.equal(harness.clients[0].stopped, true);
 });
 
-test('activation acquires the runtime targeted by the packaged language server', async () => {
+test('activation acquires the runtime targeted by the downloaded language server', async () => {
   const {runtime: version} = require('../language-server.json');
   const harness = loadExtension();
   const dotnetPath = '/acquired/dotnet';
@@ -349,24 +355,38 @@ test('folder removal stops old clients and disposes their watchers', async () =>
 });
 
 
-test('development build is asynchronous and shared across workspace clients', async () => {
+test('server acquisition is asynchronous and shared across workspace clients', async () => {
   let finish;
-  const building = new Promise(resolve => { finish = resolve; });
-  const h = loadExtension({ development: true, folders: ['/one', '/two'], buildDotnet: () => building });
+  const downloading = new Promise(resolve => { finish = resolve; });
+  const h = loadExtension({ folders: ['/one', '/two'], acquireServer: () => downloading });
   let activated = false;
   const activation = h.extension.activate(h.context).then(() => { activated = true; });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(activated, false);
   assert.equal(h.clients.length, 0);
-  assert.equal(h.processCalls.filter(args => args[0] === 'build').length, 1);
-  assert.equal(h.processCalls.find(args => args[0] === 'build')[1],
-    path.join(extensionPath, '.build/fscript/src/FScript.LanguageServer/FScript.LanguageServer.csproj'));
+  assert.deepEqual(h.serverCalls, ['resolve']);
   finish();
   await activation;
   assert.equal(h.clients.length, 3);
-  assert.equal(h.clients[0].serverOptions.run.args[0], path.join(extensionPath,
-    '.build/fscript/src/FScript.LanguageServer/bin/Debug', `net${require('../language-server.json').runtime}`, 'FScript.LanguageServer.dll'));
-  assert.equal(h.processCalls.filter(args => args[0] === 'build').length, 1);
+  assert.equal(h.clients[0].serverOptions.run.args[0], '/cache/language-servers/0.95.5/FScript.LanguageServer.dll');
+  assert.deepEqual(h.serverCalls, ['resolve', 'check']);
+  assert.equal(h.processCalls.length, 0);
+  await h.extension.deactivate();
+});
+
+test('custom server overrides managed acquisition and startup update checks', async () => {
+  const h = loadExtension({ serverPath: __filename });
+  await h.extension.activate(h.context);
+  assert.equal(h.clients[0].serverOptions.run.args[0], __filename);
+  assert.deepEqual(h.serverCalls, []);
+  await h.extension.deactivate();
+});
+
+test('failed download reports a startup error without starting clients', async () => {
+  const h = loadExtension({ acquireServer: async () => { throw new Error('Download unavailable'); } });
+  await h.extension.activate(h.context);
+  assert.equal(h.clients.length, 0);
+  assert.match(h.errors[0], /Download unavailable/);
   await h.extension.deactivate();
 });
 

@@ -25,12 +25,6 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - name: Read pinned server SDK
-        id: server
-        run: node -e 'console.log("sdk=" + require("./language-server.json").sdk)' >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ steps.server.outputs.sdk }}
       - run: npm ci
       - run: npm test
       - run: npm run prepare:server

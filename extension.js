@@ -8,6 +8,7 @@ const { scriptLaunch } = require('./script-launch');
 const { debugLaunch } = require('./debug-launch');
 const { cliCommand } = require('./cli-command');
 const { registerTestExplorer } = require('./test-explorer');
+const { createServerController } = require('./server-updates');
 const clients = new Map();
 let extensionContext;
 let configurationStatus;
@@ -16,7 +17,8 @@ let discoveryWatcher;
 let client;
 let configSubscription;
 let languageClientModule;
-let developmentServerBuild;
+let serverController;
+let managedServerUsed = false;
 let outputChannel;
 let statusItem;
 let showOutputCommandSubscription;
@@ -71,94 +73,31 @@ async function resolveDotnetCommand(context) {
   return 'dotnet';
 }
 
-function runDotnet(args, cwd) {
-  return new Promise(resolve => {
-    cp.execFile('dotnet', args, { cwd, encoding: 'utf8' }, (error, stdout, stderr) => {
-      resolve({ status: error ? (error.code || 1) : 0, stdout: stdout || '', stderr: stderr || error?.message || '' });
-    });
+function managedServer(context) {
+  if (!serverController) serverController = createServerController({
+    vscode, context, config: require('./language-server.json'),
+    log: message => outputChannel?.warn(message)
   });
+  return serverController;
 }
 
 async function createServerOptions(context, config, folder) {
   const { TransportKind } = require('vscode-languageclient/node');
-  const runtimeDotnetCommand = await resolveDotnetCommand(context);
+  let serverPath;
   if (config.serverPath) {
-    const userProvidedPath = path.isAbsolute(config.serverPath)
+    serverPath = path.isAbsolute(config.serverPath)
       ? config.serverPath
       : path.resolve(folder?.uri.fsPath || context.extensionPath, config.serverPath);
-
-    if (fs.existsSync(userProvidedPath)) {
-      return {
-        run: { command: runtimeDotnetCommand, args: [userProvidedPath], transport: TransportKind.stdio },
-        debug: { command: runtimeDotnetCommand, args: [userProvidedPath], transport: TransportKind.stdio }
-      };
-    }
-
-    vscode.window.showWarningMessage(
-      `FScript extension: configured server path does not exist: ${userProvidedPath}`
-    );
+    if (!fs.existsSync(serverPath)) throw new Error(`Configured server path does not exist: ${serverPath}`);
+  } else {
+    managedServerUsed = true;
+    const server = await managedServer(context).resolve();
+    serverPath = server.dll;
+    outputChannel?.info(`Using FScript language server ${server.version}: ${serverPath}`);
   }
-
-  const packagedDll = path.join(context.extensionPath, 'server', 'FScript.LanguageServer.dll');
-
-  if (fs.existsSync(packagedDll)) {
-    return {
-      run: { command: runtimeDotnetCommand, args: [packagedDll], transport: TransportKind.stdio },
-      debug: { command: runtimeDotnetCommand, args: [packagedDll], transport: TransportKind.stdio }
-    };
-  }
-
-  if (context.extensionMode !== vscode.ExtensionMode.Development && context.extensionMode !== vscode.ExtensionMode.Test) {
-    vscode.window.showErrorMessage(
-      'FScript extension: packaged language server is missing. Reinstall the extension or set fscript.server.path.'
-    );
-    return null;
-  }
-
-  const projectPath = path.resolve(
-    context.extensionPath,
-    '.build',
-    'fscript',
-    'src',
-    'FScript.LanguageServer',
-    'FScript.LanguageServer.csproj'
-  );
-  const outputDll = path.resolve(
-    context.extensionPath,
-    '.build',
-    'fscript',
-    'src',
-    'FScript.LanguageServer',
-    'bin',
-    'Debug',
-    `net${require('./language-server.json').runtime}`,
-    'FScript.LanguageServer.dll'
-  );
-
-  if (!developmentServerBuild) {
-    developmentServerBuild = (async () => {
-      const probe = await runDotnet(['--list-sdks'], context.extensionPath);
-      if (probe.status !== 0 || !probe.stdout.trim()) {
-        return { status: 1, stdout: '', stderr: 'Language server development requires a .NET SDK in PATH. Install an SDK or set fscript.server.path.' };
-      }
-      return runDotnet(['build', projectPath, '-nologo', '-v', 'q'], context.extensionPath);
-    })();
-  }
-  const build = await developmentServerBuild;
-
-  if (build.status !== 0 || !fs.existsSync(outputDll)) {
-    developmentServerBuild = undefined;
-    const details = [build.stdout, build.stderr].filter(Boolean).join('\n');
-    vscode.window.showErrorMessage(
-      `FScript extension: unable to build language server.\n${details}`.trim()
-    );
-    return null;
-  }
-
-  return {
-    run: { command: runtimeDotnetCommand, args: [outputDll], transport: TransportKind.stdio },
-    debug: { command: runtimeDotnetCommand, args: [outputDll], transport: TransportKind.stdio }
-  };
+  const runtimeDotnetCommand = await resolveDotnetCommand(context);
+  const executable = { command: runtimeDotnetCommand, args: [serverPath], transport: TransportKind.stdio };
+  return { run: executable, debug: executable };
 }
 
 async function stopClient() {
@@ -917,6 +856,15 @@ function registerDebugger(context) {
 }
 
 async function activate(context) {
+  serverController = undefined;
+  managedServerUsed = false;
+  context.subscriptions.push(vscode.commands.registerCommand('fscript.checkLanguageServerUpdates', async () => {
+    if (!managedServerUsed) {
+      await vscode.window.showInformationMessage('FScript: enable language services without fscript.server.path to manage server updates.');
+      return;
+    }
+    await managedServer(context).check(true);
+  }));
   registerDebugger(context);
   registerTestExplorer(vscode, context, (uri, folder) => cliCommand(getConfig(uri).cliPath, folder.uri.fsPath, uri.fsPath));
   extensionContext = context;
@@ -1039,6 +987,7 @@ async function activate(context) {
   context.subscriptions.push(textOpenSubscription);
 
   await startClient(context);
+  if (serverController) void serverController.check();
 
   configSubscription = vscode.workspace.onDidChangeConfiguration(async (event) => {
     if (
@@ -1049,8 +998,13 @@ async function activate(context) {
       event.affectsConfiguration('fscript.inlayHints.enabled') ||
       event.affectsConfiguration('fscript.hoverHints.enabled') ||
       event.affectsConfiguration('fscript.server.path') ||
+      event.affectsConfiguration('fscript.server.version') ||
       event.affectsConfiguration('fscript.server.logLevel')
     ) {
+      if (event.affectsConfiguration('fscript.server.version')) {
+        serverController?.dispose();
+        serverController = undefined;
+      }
       if (!vscode.workspace.findFiles) {
         await stopClient();
         await startClient(context);
@@ -1068,6 +1022,7 @@ async function activate(context) {
 }
 
 async function deactivate() {
+  serverController?.dispose();
   discoveryWatcher?.dispose();
   if (showOutputCommandSubscription) {
     showOutputCommandSubscription.dispose();

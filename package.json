@@ -2,7 +2,7 @@
   "name": "fscript",
   "displayName": "FScript",
   "description": "FScript, an ML-family scripting language: code completion, type checking, debugging, and tests.",
-  "version": "0.95.4",
+  "version": "0.95.5",
   "fscriptReleaseChannel": "stable",
   "publisher": "MagnusOpera",
   "icon": "assets/FScriptIcon.png",
@@ -103,6 +103,11 @@
         "command": "fscript.debugScript",
         "title": "Debug Current Script",
         "category": "FScript"
+      },
+      {
+        "command": "fscript.checkLanguageServerUpdates",
+        "title": "Check for Language Server Updates",
+        "category": "FScript"
       }
     ],
     "menus": {
@@ -157,7 +162,7 @@
           "type": "string",
           "default": "",
           "order": 4,
-          "description": "Optional path to a custom FScript.LanguageServer.dll. Relative paths are resolved from the workspace folder, or extension directory for standalone files.",
+          "description": "Optional path to a custom FScript.LanguageServer.dll. Empty downloads a supported server from FScript GitHub Releases. Relative paths resolve from the workspace folder, or extension directory for standalone files.",
           "scope": "resource"
         },
         "fscript.server.logLevel": {
@@ -190,6 +195,12 @@
           "default": "",
           "scope": "resource",
           "description": "Optional FScript CLI executable or fscript.dll used for Run Current Script and debugging. Empty uses fscript on PATH. Relative file paths resolve from the owning workspace folder, or script directory for standalone files. DLLs run through dotnet on PATH; shell commands and arguments are not accepted."
+        },
+        "fscript.server.version": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Pin a supported language server version (X.Y.Z). Empty uses the newest installed supported server and offers updates. Previous installations remain cached for rollback. Does not select or update the CLI."
         }
       }
     },
@@ -274,6 +285,8 @@
     "test:vscode": "bash scripts/test-vscode-debugger.sh"
   },
   "dependencies": {
+    "adm-zip": "0.6.1",
+    "semver": "7.8.6",
     "vscode-languageclient": "^10.1.2"
   },
   "devDependencies": {

@@ -4,10 +4,10 @@
 
 Stable and Next share the `MagnusOpera.fscript` identity. Once both channels are
 published, VS Code supplies **Switch to Pre-Release Version** and **Switch to
-Release Version** in the extension details view. Next installs the language
-server bundled in that extension version; Stable installs its stable counterpart.
+Release Version** in the extension details view. Each channel acquires a released language
+server within the version range declared by that extension.
 The user does not need a separate extension or a server-path setting. An explicit
-`fscript.server.path` overrides either bundled server as before.
+`fscript.server.path` overrides managed server acquisition as before.
 
 Switching the extension does not install a CLI. Run, debug, and REPL commands
 continue to use the user's configured CLI. Projects using new language features
@@ -21,17 +21,17 @@ values fail release validation and packaging. The manifest version remains a
 canonical numeric `X.Y.Z`, with an immutable `vX.Y.Z` extension tag and matching
 changelog section for both channels.
 
-`language-server.json` pins the exact public language commit, numeric language
-version, SDK, runtime, and Extensibility assembly identity. For Next, select the
-intended public development commit and its actual assembly versions. Never
-relabel newer source with an older release identity. The extension version is
-independent of the bundled language version. A Next package may initially use
-the same server pin as Stable to validate distribution.
+`language-server.json` declares the supported server version range and runtime.
+Both channels currently acquire stable canonical FScript GitHub Releases;
+Next is an extension preview channel, not an unpublished server source build.
+To try unpublished language changes, use `fscript.server.path`. For a breaking
+server change, publish its FScript assets first and then an extension with the
+new range. Extension versions remain independent of language versions.
 
 `npm run package` reads the committed channel and passes `--pre-release` to vsce
 for Next. Direct channel overrides are rejected. VSIX inspection checks that
 `Microsoft.VisualStudio.Code.PreRelease` metadata agrees with the manifest
-channel, as well as the existing identity and bundled server checks.
+channel, as well as the identity and absence of bundled server binaries.
 
 ## Publication and retries
 

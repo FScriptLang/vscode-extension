@@ -4,6 +4,9 @@ All notable changes to FScript are documented in this file.
 
 ## [Unreleased]
 
+- Download supported language servers from FScript releases and offer upgrades without reinstalling the extension.
+- Keep cached servers available offline and support version pinning and rollback.
+
 ## [0.95]
 
 ### [v0.95.4]

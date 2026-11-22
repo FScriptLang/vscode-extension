@@ -25,13 +25,17 @@ let calculate value =
 calculate 41
 SCRIPT
 python3 - "$fixture/workspace/.vscode/settings.json" "$source_repo/src/FScript/bin/Release/net11.0/fscript.dll" <<'PYSETTINGS'
-import json,pathlib,sys
-pathlib.Path(sys.argv[1]).write_text(json.dumps({
+import json,os,pathlib,sys
+settings = {
     'fscript.lsp.enabled': True,
     'fscript.server.path': str(pathlib.Path(sys.argv[2]).parents[5] / 'src/FScript.LanguageServer/bin/Release/net11.0/FScript.LanguageServer.dll'),
     'fscript.cli.path': sys.argv[2],
     'terminal.integrated.enablePersistentSessions': False
-}))
+}
+if os.environ.get('FSCRIPT_MANAGED_SERVER_VERSION'):
+    settings.pop('fscript.server.path')
+    settings['fscript.server.version'] = os.environ['FSCRIPT_MANAGED_SERVER_VERSION']
+pathlib.Path(sys.argv[1]).write_text(json.dumps(settings))
 PYSETTINGS
 FSCRIPT_SOURCE="$source_repo" FSCRIPT_VSCODE_SMOKE_RESULT="$fixture/result" "$vscode_executable" \
   --user-data-dir "$fixture/user-data" \

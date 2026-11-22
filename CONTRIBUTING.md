@@ -2,8 +2,8 @@
 
 ## Development
 
-Extension development requires Node.js 24 and the .NET SDK pinned in
-`language-server.json`. From this repository:
+Extension development and packaging require Node.js 24, without a .NET SDK or
+FScript source checkout:
 
 ```sh
 npm ci
@@ -13,66 +13,76 @@ npm run package
 node scripts/verify-vsix.mjs "fscript-$(node -p 'require("./package.json").version').vsix"
 ```
 
-`prepare:server` fetches a public FScript checkout into ignored `.build/fscript`,
-checks out the immutable commit in `language-server.json`, and builds the
-language server into ignored `server/`. It preserves dirty checkouts, verifies
-runtime and assembly versions, and tests real provider loading against those
-binaries before packaging. No GitHub PAT or marketplace secret is needed to
-build. The source repository's canonical `vX.Y.Z` convention applies to future
-language tags. Existing tags and releases are not migrated.
+`prepare:server` validates `language-server.json`; packaging never downloads or
+bundles a server. F5 acquires a released compatible server into VS Code's global
+extension storage and acquires its .NET runtime through the .NET Install Tool,
+with PATH fallback. First use requires network access. Subsequent activations
+start the cached server and check GitHub Releases in the background.
 
-Press F5 from this checkout after preparing the server. The .NET Install Tool
-acquires the runtime pinned in `language-server.json`, with PATH fallback.
-`npm test` covers activation, configuration selection, debugger routing, grammar,
-and release packaging. `test/vscode/` contains the on-demand real editor smoke
-test. To use it, build the CLI and provider fixtures in a FScript checkout,
-then run `FSCRIPT_SOURCE=/absolute/path/to/FScript npm run test:vscode` with
-VS Code installed. Set `VSCODE_EXECUTABLE` if it is not on PATH or at the
-standard macOS location. Linux requires a graphical session or Xvfb.
+To prefetch a released server for inspection, run
+`npm run prepare:server -- --download` (optionally followed by `X.Y.Z`). This
+uses `.build/language-servers`, not the running extension's global cache.
+To test unpublished language changes, set `fscript.server.path` and
+`fscript.cli.path` to build outputs in your FScript checkout. No implicit local
+source build occurs. `FSCRIPT_SOURCE=/absolute/path/to/FScript npm run test:vscode`
+runs the real editor smoke test after building that checkout's CLI, server, and
+provider fixtures. Set `VSCODE_EXECUTABLE` if necessary; Linux needs a display or
+Xvfb. Add `FSCRIPT_MANAGED_SERVER_VERSION=X.Y.Z` to exercise real release
+acquisition in the isolated editor host instead of a custom local server.
+`npm test` covers acquisition, update prompts, activation, configuration,
+debugger routing, grammar, and packaging.
 
-To test current language development, set `fscript.server.path` and
-`fscript.cli.path` to binaries from your FScript checkout. Normal extension
-builds deliberately use the committed server pin rather than a sibling folder.
+## Language-server releases and compatibility
 
-## Release
+FScriptLang/FScript owns the server implementation and tests. Its ordinary
+canonical `vX.Y.Z` GitHub Releases publish:
 
-The extension keeps the existing `MagnusOpera.fscript` identity and publishes
-under the Magnus Opera umbrella. FScript no longer builds or publishes VSIX
-artifacts. Extension releases are independent of language releases.
+- `fscript-lsp-X.Y.Z-dotnet.zip`: a portable managed server and all dependencies.
+- `fscript-lsp-X.Y.Z.json`: schema version, language/server version, source
+  revision, required .NET runtime, archive name, and SHA-256.
 
-1. Set `OPEN_VSX_TOKEN` in this repository's `release` environment. Restrict that
-   environment to `main` and `v*` tags in GitHub's deployment rules. Marketplace uses
-   Trusted Publishing through GitHub OIDC, with the policy configured for
-   `FScriptLang/vscode-extension`, `.github/workflows/release.yml`, and environment
-   `release`. The marketplace job requests `id-token: write` and runs `vsce publish --oidc`;
-   no Marketplace token or Azure login is used.
-2. Update `language-server.json` when adopting a new language release: pin its
-   exact commit, numeric package version, .NET SDK and runtime, and
-   Extensibility assembly version together. Keep the
-   packaged Runtime/Language assembly versions aligned with that release's
-   NuGet packages. The extension version may advance independently.
-3. Set `fscriptReleaseChannel` in `package.json` to `stable` or `next` and choose
-   a distinct numeric extension version with `npm version X.Y.Z --no-git-tag-version`.
-   Follow the [channel version ordering rules](docs/release-channels.md).
-4. Document it under `### [vX.Y.Z]` in `CHANGELOG.md`, retaining Unreleased above.
-5. Commit, tag `vX.Y.Z`, and push the commit and tag. CI requires the tag to
-   match the committed package version and release notes.
+`language-server.json` declares the supported numeric language version range
+and .NET runtime. Restrict the range before a breaking server or runtime change;
+a new extension can then adopt the new range. No compatibility shim is required.
+The initial minimum is 0.95.5, the first prospective release using this artifact
+contract. Historical releases are not rewritten. **Publish the first FScript
+release with these assets before releasing this extension change.**
 
-The tag workflow validates, tests, builds and inspects one VSIX, creates a GitHub
-release, then publishes that artifact to VS Code Marketplace and Open VSX.
-Next packages carry pre-release metadata in both registries; their GitHub
-releases are marked pre-release and do not replace the latest stable release.
-Main pushes and pull requests only test and produce an installable VSIX artifact.
-No marketplace publication happens on main. The manual **Publish Extension**
-workflow accepts an existing extension tag for retries, checking out that exact
-tag even when dispatched from main. For a Marketplace-only retry, select
-`marketplace_only` to publish the existing GitHub release VSIX using the
-publishing tool from the workflow revision. Already-published marketplace versions are
-accepted on retries. Only the extension's restricted `release` environment holds
-`OPEN_VSX_TOKEN`. Do not duplicate it as a repository or organization secret,
-which a modified same-repository PR could read without entering an environment.
-PR validation uses read-only permissions and does not request publishing OIDC
-tokens.
+Startup selects the newest healthy cached supported server, or installs the
+newest supported stable release if none is cached. Update checks ignore drafts,
+pre-releases, noncanonical tags, and releases without both assets. A compatible
+update is offered, never installed silently over an existing server. A newer
+incompatible release offers an extension update. A user-level
+`fscript.server.version` pin selects an exact supported version and suppresses
+server upgrade offers; older cached installations remain available for rollback.
+Clear the pin to resume upgrades. Downloads verify the checksum and distribution
+before an atomic installation. Failed downloads leave prior versions usable.
+Automatic update-check failures only log; the explicit update command reports
+failures. The extension runs acquisition on its own host, including SSH/WSL and
+containers. Server updates never install or update the user's CLI.
 
-Historical language changelog entries are kept because they were included in
-earlier VSIX packages. New entries describe only extension changes.
+## Extension release
+
+The extension retains `MagnusOpera.fscript`. FScript publishes language binaries;
+this repository publishes the VSIX independently.
+
+1. For breaking server changes, publish the FScript release assets first, then
+   adopt their version range/runtime in `language-server.json`. Validate the
+   downloaded server and selected CLI together in the real editor smoke test.
+2. Set `fscriptReleaseChannel` to `stable` or `next`, choose a distinct numeric
+   extension version, and follow [channel ordering](docs/release-channels.md).
+3. Add `### [vX.Y.Z]` release notes, retaining Unreleased above, and run the
+   development checks above. Tag and push only when requested.
+
+Main and pull requests only build and test. The tag workflow validates, builds,
+inspects, and publishes one VSIX to GitHub, Marketplace, and Open VSX. Marketplace
+uses GitHub OIDC Trusted Publishing bound to `FScriptLang/vscode-extension`,
+`.github/workflows/release.yml`, and the restricted `release` environment, with
+job-scoped `id-token: write` and `vsce publish --oidc`. Only Open VSX uses the
+`OPEN_VSX_TOKEN` secret, held in that environment. Restrict its deployment rules
+to `main` and `v*` tags. PRs receive neither publishing secrets nor OIDC access.
+
+Manual retries select an existing immutable extension tag. For Marketplace-only
+failure, use `marketplace_only` to republish its existing GitHub release VSIX
+with the corrected workflow revision. Published versions and tags stay immutable.
+Historical changelog entries remain; new notes describe extension changes only.
